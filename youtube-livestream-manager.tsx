@@ -8,8 +8,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { PlayCircle, PauseCircle, Trash2, Download } from "lucide-react"
 
 // URL dasar API dan WebSocket
-const API_BASE = "http://127.0.0.1:8000/api"
-const WS_URL = "ws://127.0.0.1:8000/ws"
+const API_BASE = `http://${window.location.hostname}:8000/api`;  // Menggunakan alamat IP/hostname server
+const WS_URL = `ws://${window.location.hostname}:8000/ws`;      // Menggunakan alamat IP/hostname server
+
 
 // Komponen untuk menampilkan statistik server
 function ServerStatsWidget() {
