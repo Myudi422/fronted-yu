@@ -8,8 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { PlayCircle, PauseCircle, Trash2, Download } from "lucide-react"
 
 // URL dasar API dan WebSocket
-const API_BASE = "https://organic-space-chainsaw-xv5g79gwqg9c9qgr-8000.app.github.dev/api"
-const WS_URL = "wss://organic-space-chainsaw-xv5g79gwqg9c9qgr-8000.app.github.dev/ws"
+const API_BASE = "http://localhost:8000/api"
+const WS_URL = "ws://localhost:8000/ws"
 
 // Komponen untuk menampilkan statistik server
 function ServerStatsWidget() {
