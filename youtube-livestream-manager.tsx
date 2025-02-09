@@ -163,6 +163,14 @@ export default function YoutubeLivestreamManager() {
       return
     }
 
+    // Validasi format URL Google Drive
+    // Format yang diinginkan: https://drive.google.com/uc?id=YOUR_FILE_ID
+    const validUrlPattern = /^https:\/\/drive\.google\.com\/uc\?id=[\w-]+$/;
+    if (!validUrlPattern.test(driveUrl.trim())) {
+      alert("Google Drive URL harus berformat:\nhttps://drive.google.com/uc?id=YOUR_FILE_ID")
+      return;
+    }
+
     // Tampilkan popup loading
     setIsDownloading(true)
     try {
