@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { PlayCircle, PauseCircle, Trash2, Download } from "lucide-react"
+import { Progress } from "@/components/ui/progress";
+import { Cpu, HardDrive, MemoryStick, Clock, Play, Calendar } from "lucide-react";
 
 // URL dasar API dan WebSocket
 const PROTOCOL = window.location.protocol === "https:" ? "https" : "http";
@@ -21,50 +23,114 @@ const WS_URL = `${WS_PROTOCOL}://${window.location.hostname.replace("3000", "800
 console.log(API_BASE);
 console.log(WS_URL);
 
-// Komponen untuk menampilkan statistik server
 function ServerStatsWidget() {
-  const [stats, setStats] = useState(null)
+  const [stats, setStats] = useState({
+    cpu_percent: 0,
+    memory: { percent: 0, used: 0, total: 1 },
+    disk: { percent: 0, used: 0, total: 1 },
+    uptime: "N/A",
+    active_streams: 0,
+    scheduled_streams: 0,
+    downloaded_files: 0,
+  });
 
   useEffect(() => {
     async function fetchStats() {
       try {
-        const res = await fetch(`${API_BASE}/server-stats`)
-        const data = await res.json()
-        setStats(data)
+        const res = await fetch(`${API_BASE}/server-stats`);
+        if (!res.ok) throw new Error("Failed to fetch");
+        const data = await res.json();
+        setStats(data);
       } catch (error) {
-        console.error("Error fetching server stats:", error)
+        console.error("Error fetching server stats:", error);
+        // Biarkan stats tetap dengan nilai default jika terjadi error
       }
     }
 
-    // Ambil data segera saat komponen dimount dan perbarui tiap 5 detik
-    fetchStats()
-    const interval = setInterval(fetchStats, 5000)
-    return () => clearInterval(interval)
-  }, [])
+    fetchStats();
+    const interval = setInterval(fetchStats, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
-  if (!stats) return <div>Loading server stats...</div>
+// Data untuk ditampilkan
+const statsData = [
+  {
+    icon: <Cpu className="w-6 h-6 text-blue-500" />,
+    label: "CPU Usage",
+    value: `${stats.cpu_percent}%`,
+    progress: stats.cpu_percent,
+  },
+  {
+    icon: <MemoryStick className="w-6 h-6 text-green-500" />,
+    label: "Memory Usage",
+    value: `${stats.memory.percent}% (${(stats.memory.used / (1024 * 1024)).toFixed(2)} MB / ${(stats.memory.total / (1024 * 1024)).toFixed(2)} MB)`,
+    progress: stats.memory.percent,
+  },
+  {
+    icon: <HardDrive className="w-6 h-6 text-red-500" />,
+    label: "Disk Usage",
+    value: `${stats.disk.percent}% (${(stats.disk.used / (1024 * 1024 * 1024)).toFixed(2)} GB / ${(stats.disk.total / (1024 * 1024 * 1024)).toFixed(2)} GB)`,
+    progress: stats.disk.percent,
+  },
+  {
+    icon: <Clock className="w-6 h-6 text-yellow-500" />,
+    label: "Uptime",
+    value: stats.uptime,
+  },
+  {
+    icon: <Play className="w-6 h-6 text-purple-500" />,
+    label: "Active Streams",
+    value: stats.active_streams,
+  },
+  {
+    icon: <Calendar className="w-6 h-6 text-orange-500" />,
+    label: "Scheduled Streams",
+    value: stats.scheduled_streams,
+  },
+  {
+    icon: <Download className="w-6 h-6 text-teal-500" />,
+    label: "Downloaded Files",
+    value: stats.downloaded_files,
+  },
+];
 
-  return (
-    <div className="border p-4 rounded-md mb-4">
-      <h3 className="font-semibold mb-2">Server Stats</h3>
-      <div className="text-sm">
-        <p><strong>CPU Usage:</strong> {stats.cpu_percent}%</p>
-        <p>
-          <strong>Memory Usage:</strong> {stats.memory.percent}%{" "}
-          (Used: {(stats.memory.used / (1024 * 1024)).toFixed(2)} MB / Total: {(stats.memory.total / (1024 * 1024)).toFixed(2)} MB)
-        </p>
-        <p>
-          <strong>Disk Usage:</strong> {stats.disk.percent}%{" "}
-          (Used: {(stats.disk.used / (1024 * 1024 * 1024)).toFixed(2)} GB / Total: {(stats.disk.total / (1024 * 1024 * 1024)).toFixed(2)} GB)
-        </p>
-        <p><strong>Uptime:</strong> {stats.uptime}</p>
-        <p><strong>Active Streams:</strong> {stats.active_streams}</p>
-        <p><strong>Scheduled Streams:</strong> {stats.scheduled_streams}</p>
-        <p><strong>Downloaded Files:</strong> {stats.downloaded_files}</p>
+return (
+  <Card className="p-4">
+    <CardHeader>
+      <CardTitle>Server Stats</CardTitle>
+    </CardHeader>
+    <CardContent>
+      {/* Grid Responsif: 1 kolom di mobile, 2 di tablet, 3 & 4 di desktop */}
+      <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+        {/* Baris Pertama (3 item) */}
+        {statsData.slice(0, 3).map((stat, index) => (
+          <div key={index} className="flex items-center gap-2 p-2 bg-gray-100 rounded-md">
+            {stat.icon}
+            <div className="w-full">
+              <p className="text-sm font-medium">{stat.label}: {stat.value}</p>
+              {stat.progress !== undefined && <Progress value={stat.progress} />}
+            </div>
+          </div>
+        ))}
       </div>
-    </div>
-  )
+      
+      {/* Baris Kedua (4 item) */}
+      <div className="grid gap-4 mt-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+        {statsData.slice(3).map((stat, index) => (
+          <div key={index + 3} className="flex items-center gap-2 p-2 bg-gray-100 rounded-md">
+            {stat.icon}
+            <div className="w-full">
+              <p className="text-sm font-medium">{stat.label}: {stat.value}</p>
+              {stat.progress !== undefined && <Progress value={stat.progress} />}
+            </div>
+          </div>
+        ))}
+      </div>
+    </CardContent>
+  </Card>
+);
 }
+
 
 export default function YoutubeLivestreamManager() {
   // State untuk livestream manager
@@ -329,7 +395,7 @@ export default function YoutubeLivestreamManager() {
       <Card>
         <CardHeader>
           <CardTitle>
-            Livestream Manager (Realtime, Multi-Stream & Scheduler)
+            Livestream Manager - YukStream 💕
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -413,7 +479,7 @@ export default function YoutubeLivestreamManager() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="now">Now</SelectItem>
-              <SelectItem value="schedule">Schedule</SelectItem>
+              <SelectItem value="schedule">Schedule - Local Time</SelectItem>
             </SelectContent>
           </Select>
 
@@ -475,9 +541,9 @@ export default function YoutubeLivestreamManager() {
             >
               <p className="truncate flex-1">
                 {stream.file} -{" "}
-                {new Date(stream.schedule_time).toLocaleString("id-ID", {
-                  timeZone: "Asia/Jakarta",
-                })}
+                {new Date(stream.schedule_time).toLocaleString(navigator.language, {
+  timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+})}
               </p>
               <div className="flex gap-2">
                 <Button onClick={() => handleStartScheduledStream(stream.id)}>
@@ -493,6 +559,12 @@ export default function YoutubeLivestreamManager() {
           ))}
         </CardContent>
       </Card>
+      <footer className="w-full py-4 bg-gray-900 text-white text-center text-sm mt-8">
+      <p>
+        Made with ❤️ by <span className="font-semibold">YukStream</span> &copy; 2025
+      </p>
+    </footer>
     </div>
+    
   )
 }
