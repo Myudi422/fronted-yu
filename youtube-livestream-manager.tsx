@@ -20,8 +20,33 @@ const PORT = USE_PORT ? ":8000" : "";
 const API_BASE = `${PROTOCOL}://${window.location.hostname.replace("3000", "8000")}${PORT}/api`;
 const WS_URL = `${WS_PROTOCOL}://${window.location.hostname.replace("3000", "8000")}${PORT}/ws`;
 
+const [driveUrl, setDriveUrl] = useState("");
+const [customRtmpUrl, setCustomRtmpUrl] = useState("");
+const [youtubeKey, setYoutubeKey] = useState("");
+
 console.log(API_BASE);
 console.log(WS_URL);
+
+useEffect(() => {
+  const storedDriveUrl = localStorage.getItem("driveUrl");
+  if (storedDriveUrl) setDriveUrl(storedDriveUrl);
+  const storedYoutubeKey = localStorage.getItem("youtubeKey");
+  if (storedYoutubeKey) setYoutubeKey(storedYoutubeKey);
+  const storedCustomRtmpUrl = localStorage.getItem("customRtmpUrl");
+  if (storedCustomRtmpUrl) setCustomRtmpUrl(storedCustomRtmpUrl);
+
+useEffect(() => {
+  localStorage.setItem("driveUrl", driveUrl);
+  }, [driveUrl]);
+
+useEffect(() => {
+  localStorage.setItem("youtubeKey", youtubeKey);
+  }, [youtubeKey]);
+
+useEffect(() => {
+  localStorage.setItem("customRtmpUrl", customRtmpUrl);
+  }, [customRtmpUrl]);
+
 
 function ServerStatsWidget() {
   const [stats, setStats] = useState({
