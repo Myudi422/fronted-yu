@@ -186,7 +186,7 @@ export default function YoutubeLivestreamManager() {
   // Koneksi WebSocket untuk update realtime
   useEffect(() => {
     const ws = new WebSocket(WS_URL)
-
+  
     ws.onopen = () => {
       console.log("WebSocket connected.")
     }
@@ -214,6 +214,7 @@ export default function YoutubeLivestreamManager() {
     }
     return () => ws.close()
   }, [])
+  
 
   // Fetch data awal
   useEffect(() => {
@@ -221,6 +222,15 @@ export default function YoutubeLivestreamManager() {
     fetchStreams()
     fetchScheduledStreams()
   }, [])
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchStreams();
+      fetchScheduledStreams();
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+  
 
   // Fungsi API untuk download, stream, toggle, dan delete
   const handleDownload = async () => {
