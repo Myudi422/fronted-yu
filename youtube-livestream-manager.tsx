@@ -83,6 +83,9 @@ export default function YoutubeLivestreamManager() {
   const [streams, setStreams] = useState([])
   const [scheduledStreams, setScheduledStreams] = useState([])
 
+  // State tambahan untuk popup loading download
+  const [isDownloading, setIsDownloading] = useState(false)
+
   // Fungsi pembantu untuk re-fetch data
   const fetchFiles = async () => {
     try {
@@ -124,7 +127,6 @@ export default function YoutubeLivestreamManager() {
     ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data)
-        // Jika ada data file, update state
         if (data.files) {
           setFiles(data.files)
         }
@@ -161,6 +163,8 @@ export default function YoutubeLivestreamManager() {
       return
     }
 
+    // Tampilkan popup loading
+    setIsDownloading(true)
     try {
       const response = await fetch(`${API_BASE}/download`, {
         method: "POST",
@@ -181,6 +185,8 @@ export default function YoutubeLivestreamManager() {
       }
     } catch (error) {
       console.error("Download failed:", error)
+    } finally {
+      setIsDownloading(false)
     }
   }
 
@@ -197,7 +203,6 @@ export default function YoutubeLivestreamManager() {
       const data = await response.json()
       if (response.ok) {
         alert("File deleted successfully.")
-        // Refresh file list
         await fetchFiles()
         setSelectedFile("")
       } else {
@@ -213,7 +218,6 @@ export default function YoutubeLivestreamManager() {
       alert("Please select a file and enter your stream key.")
       return
     }
-    // Jika platform "other", pastikan custom RTMP URL diisi
     if (platform === "other" && !customRtmpUrl.trim()) {
       alert("Please enter a custom RTMP URL for 'Other' platform.")
       return
@@ -242,7 +246,6 @@ export default function YoutubeLivestreamManager() {
         setSelectedFile("")
         setYoutubeKey("")
         setScheduleDate("")
-        // Refresh scheduled streams
         await fetchScheduledStreams()
       } catch (error) {
         alert("Error scheduling stream")
@@ -258,7 +261,6 @@ export default function YoutubeLivestreamManager() {
       })
       setSelectedFile("")
       setYoutubeKey("")
-      // Refresh active streams
       await fetchStreams()
     } catch (error) {
       alert("Error starting stream")
@@ -268,7 +270,6 @@ export default function YoutubeLivestreamManager() {
   const handleToggleStream = async (id) => {
     try {
       await fetch(`${API_BASE}/streams/${id}/toggle`, { method: "PATCH" })
-      // Refresh streams agar perubahan langsung terlihat
       await fetchStreams()
     } catch (error) {
       alert("Error toggling stream")
@@ -278,7 +279,6 @@ export default function YoutubeLivestreamManager() {
   const handleDeleteStream = async (id) => {
     try {
       await fetch(`${API_BASE}/streams/${id}`, { method: "DELETE" })
-      // Refresh streams
       await fetchStreams()
     } catch (error) {
       alert("Error deleting stream")
@@ -288,7 +288,6 @@ export default function YoutubeLivestreamManager() {
   const handleDeleteScheduledStream = async (id) => {
     try {
       await fetch(`${API_BASE}/scheduled/${id}`, { method: "DELETE" })
-      // Refresh scheduled streams
       await fetchScheduledStreams()
     } catch (error) {
       alert("Error deleting scheduled stream")
@@ -298,9 +297,7 @@ export default function YoutubeLivestreamManager() {
   const handleStartScheduledStream = async (id) => {
     try {
       await fetch(`${API_BASE}/scheduled/${id}/start`, { method: "POST" })
-      // Refresh scheduled streams
       await fetchScheduledStreams()
-      // Refresh active streams (jika stream berpindah status)
       await fetchStreams()
     } catch (error) {
       alert("Error starting scheduled stream")
@@ -309,6 +306,15 @@ export default function YoutubeLivestreamManager() {
 
   return (
     <div className="container mx-auto p-4 space-y-6">
+      {/* Popup loading download */}
+      {isDownloading && (
+        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+          <div className="bg-white p-4 rounded-md shadow-md">
+            <p className="text-lg font-semibold">Downloading... Please wait</p>
+          </div>
+        </div>
+      )}
+
       {/* Widget Server Stats */}
       <ServerStatsWidget />
 
