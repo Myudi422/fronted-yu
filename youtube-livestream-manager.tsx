@@ -12,15 +12,15 @@ import { PlayCircle, PauseCircle, Trash2, Download } from "lucide-react"
 const PROTOCOL = window.location.protocol === "https:" ? "https" : "http";
 const WS_PROTOCOL = window.location.protocol === "https:" ? "wss" : "ws";
 
-// Cek apakah hostname mengandung "app.github.dev"
-const USE_PORT = !window.location.hostname.includes("app.github.dev");
-const PORT = USE_PORT ? ":8000" : ""; // Tambahkan port jika bukan dari "app.github.dev"
+// Hapus port jika menggunakan HTTPS
+const PORT = window.location.protocol === "https:" ? "" : ":8000";
 
 const API_BASE = `${PROTOCOL}://${window.location.hostname}${PORT}/api`;
 const WS_URL = `${WS_PROTOCOL}://${window.location.hostname}${PORT}/ws`;
 
 console.log(API_BASE);
 console.log(WS_URL);
+
 
 
 // Komponen untuk menampilkan statistik server
