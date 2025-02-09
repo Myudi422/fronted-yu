@@ -279,152 +279,179 @@ ws.onmessage = (event) => {
     }
   }
 
-  return (
-    <div className="container mx-auto p-4 space-y-6">
-      {/* Widget Server Stats */}
-      <ServerStatsWidget />
+return (
+  <div className="container mx-auto p-4 space-y-6">
+    {/* Widget Server Stats */}
+    <ServerStatsWidget />
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Livestream Manager (Realtime, Multi-Stream & Scheduler)</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-         {/* Input URL Google Drive */}
-<div className="flex space-x-2">
-  <Input
-    placeholder="Enter Google Drive URL"
-    value={driveUrl}
-    onChange={(e) => setDriveUrl(e.target.value)}
-  />
-  <Input
-    placeholder="Custom File Name (Optional)"
-    value={customName}
-    onChange={(e) => setCustomName(e.target.value)}
-  />
-  <Button onClick={handleDownload} disabled={!driveUrl}>
-    <Download className="mr-2 h-4 w-4" /> Download
-  </Button>
-</div>
-
-
-          {/* Pilih File dan tombol Delete */}
-          <div className="flex space-x-2 items-center">
-            <Select value={selectedFile} onValueChange={(value) => setSelectedFile(value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a file" />
-              </SelectTrigger>
-              <SelectContent>
-                {files.map((file) => (
-                  <SelectItem key={file} value={file}>
-                    {file}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Button onClick={handleDeleteFile} disabled={!selectedFile}>
-              <Trash2 className="mr-2 h-4 w-4" /> Delete File
-            </Button>
-          </div>
-
-          {/* Input Stream Key (bisa untuk YouTube, Facebook, dll.) */}
+    <Card>
+      <CardHeader>
+        <CardTitle>
+          Livestream Manager (Realtime, Multi-Stream & Scheduler)
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {/* Row 1: Input Google Drive URL & Custom File Name (stacked) dan tombol Download */}
+        <div className="flex flex-col gap-2">
           <Input
-            placeholder="Enter Stream Key"
-            value={youtubeKey}
-            onChange={(e) => setYoutubeKey(e.target.value)}
+            placeholder="Enter Google Drive URL"
+            value={driveUrl}
+            onChange={(e) => setDriveUrl(e.target.value)}
+            className="w-full"
           />
-
-          {/* Pilih Platform */}
-          <Select value={platform} onValueChange={(value) => setPlatform(value)}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select Platform" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="youtube">YouTube</SelectItem>
-              <SelectItem value="facebook">Facebook</SelectItem>
-              <SelectItem value="other">Other</SelectItem>
-            </SelectContent>
-          </Select>
-
-          {platform === "other" && (
-            <Input
-              placeholder="Enter Custom RTMP URL"
-              value={customRtmpUrl}
-              onChange={(e) => setCustomRtmpUrl(e.target.value)}
-            />
-          )}
-
-          {/* Pilih Jadwal */}
-          <Select value={scheduleType} onValueChange={setScheduleType}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select Schedule Type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="now">Now</SelectItem>
-              <SelectItem value="schedule">Schedule</SelectItem>
-            </SelectContent>
-          </Select>
-
-          {scheduleType === "schedule" && (
-            <Input
-              type="datetime-local"
-              value={scheduleDate}
-              onChange={(e) => setScheduleDate(e.target.value)}
-            />
-          )}
-
-          <Button onClick={handleStartStream} disabled={!selectedFile || !youtubeKey}>
-            <PlayCircle className="mr-2 h-4 w-4" /> {scheduleType === "schedule" ? "Schedule Stream" : "Start Now"}
+          <Input
+            placeholder="Custom File Name (Optional)"
+            value={customName}
+            onChange={(e) => setCustomName(e.target.value)}
+            className="w-full"
+          />
+          <Button onClick={handleDownload} disabled={!driveUrl} className="flex-none">
+            <Download className="h-4 w-4" />
+            <span className="ml-2">Download</span>
           </Button>
+        </div>
 
-          {/* Daftar Streaming Aktif */}
-          <h3 className="font-semibold mt-4">Active Streams</h3>
-          {streams.map((stream) => (
-            <div key={stream.id} className="p-4 bg-gray-100 rounded-md flex justify-between items-center">
-              <p>
-                {stream.file} ({stream.youtube_key})
-              </p>
-              <div className="flex space-x-2">
-                <Button onClick={() => handleToggleStream(stream.id)}>
-                  {stream.active ? (
-                    <>
-                      <PauseCircle className="mr-2 h-4 w-4" /> Pause
-                    </>
-                  ) : (
-                    <>
-                      <PlayCircle className="mr-2 h-4 w-4" /> Play
-                    </>
-                  )}
-                </Button>
-                <Button onClick={() => handleDeleteStream(stream.id)}>
-                  <Trash2 className="mr-2 h-4 w-4" /> Delete
-                </Button>
-              </div>
-            </div>
-          ))}
+        {/* Row 2: Pilih File dan tombol Delete */}
+        <div className="flex items-center gap-2">
+          <Select
+            value={selectedFile}
+            onValueChange={(value) => setSelectedFile(value)}
+            className="flex-1"
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select a file" />
+            </SelectTrigger>
+            <SelectContent>
+              {files.map((file) => (
+                <SelectItem key={file} value={file}>
+                  {file}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button onClick={handleDeleteFile} disabled={!selectedFile} className="flex-none">
+            <Trash2 className="h-4 w-4" />
+            <span className="ml-2">Delete</span>
+          </Button>
+        </div>
 
-          {/* Daftar Streaming yang Dijadwalkan */}
-          <h3 className="font-semibold mt-4">Scheduled Streams</h3>
-          {scheduledStreams.map((stream) => (
-            <div key={stream.id} className="p-4 bg-yellow-100 rounded-md flex justify-between items-center">
-              <p>
-                {stream.file} -{" "}
-                {new Date(stream.schedule_time).toLocaleString("id-ID", {
-                  timeZone: "Asia/Jakarta"
-                })}
-              </p>
-              <div className="flex space-x-2">
-                <Button onClick={() => handleStartScheduledStream(stream.id)}>
-                  <PlayCircle className="mr-2 h-4 w-4" /> Start Now
-                </Button>
-                <Button onClick={() => handleDeleteScheduledStream(stream.id)}>
-                  <Trash2 className="mr-2 h-4 w-4" /> Delete
-                </Button>
-              </div>
+        {/* Row 3: Input Stream Key */}
+        <Input
+          placeholder="Enter Stream Key"
+          value={youtubeKey}
+          onChange={(e) => setYoutubeKey(e.target.value)}
+          className="w-full"
+        />
+
+        {/* Row 4: Pilih Platform */}
+        <Select value={platform} onValueChange={(value) => setPlatform(value)} className="w-full">
+          <SelectTrigger>
+            <SelectValue placeholder="Select Platform" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="youtube">YouTube</SelectItem>
+            <SelectItem value="facebook">Facebook</SelectItem>
+            <SelectItem value="other">Other</SelectItem>
+          </SelectContent>
+        </Select>
+
+        {platform === "other" && (
+          <Input
+            placeholder="Enter Custom RTMP URL"
+            value={customRtmpUrl}
+            onChange={(e) => setCustomRtmpUrl(e.target.value)}
+            className="w-full"
+          />
+        )}
+
+        {/* Row 5: Pilih Jadwal */}
+        <Select value={scheduleType} onValueChange={setScheduleType} className="w-full">
+          <SelectTrigger>
+            <SelectValue placeholder="Select Schedule Type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="now">Now</SelectItem>
+            <SelectItem value="schedule">Schedule</SelectItem>
+          </SelectContent>
+        </Select>
+
+        {scheduleType === "schedule" && (
+          <Input
+            type="datetime-local"
+            value={scheduleDate}
+            onChange={(e) => setScheduleDate(e.target.value)}
+            className="w-full"
+          />
+        )}
+
+        {/* Row 6: Tombol Start Stream (selalu tampil teksnya, juga di mobile) */}
+        <Button onClick={handleStartStream} disabled={!selectedFile || !youtubeKey}>
+          <PlayCircle className="h-4 w-4" />
+          <span className="ml-2">
+            {scheduleType === "schedule" ? "Schedule Stream" : "Start Now"}
+          </span>
+        </Button>
+
+        {/* Daftar Streaming Aktif */}
+        <h3 className="font-semibold">Active Streams</h3>
+        {streams.map((stream) => (
+          <div
+            key={stream.id}
+            className="p-4 bg-gray-100 rounded-md flex items-center justify-between"
+          >
+            <p className="truncate flex-1">
+              {stream.file} ({stream.youtube_key})
+            </p>
+            <div className="flex gap-2">
+              <Button onClick={() => handleToggleStream(stream.id)}>
+                {stream.active ? (
+                  <>
+                    <PauseCircle className="h-4 w-4" />
+                    <span className="ml-2">Pause</span>
+                  </>
+                ) : (
+                  <>
+                    <PlayCircle className="h-4 w-4" />
+                    <span className="ml-2">Play</span>
+                  </>
+                )}
+              </Button>
+              <Button onClick={() => handleDeleteStream(stream.id)}>
+                <Trash2 className="h-4 w-4" />
+                <span className="ml-2">Delete</span>
+              </Button>
             </div>
-          ))}
-        </CardContent>
-      </Card>
-    </div>
-  )
+          </div>
+        ))}
+
+        {/* Daftar Streaming yang Dijadwalkan */}
+        <h3 className="font-semibold">Scheduled Streams</h3>
+        {scheduledStreams.map((stream) => (
+          <div
+            key={stream.id}
+            className="p-4 bg-yellow-100 rounded-md flex items-center justify-between"
+          >
+            <p className="truncate flex-1">
+              {stream.file} -{" "}
+              {new Date(stream.schedule_time).toLocaleString("id-ID", {
+                timeZone: "Asia/Jakarta",
+              })}
+            </p>
+            <div className="flex gap-2">
+              <Button onClick={() => handleStartScheduledStream(stream.id)}>
+                <PlayCircle className="h-4 w-4" />
+                <span className="ml-2">Start Now</span>
+              </Button>
+              <Button onClick={() => handleDeleteScheduledStream(stream.id)}>
+                <Trash2 className="h-4 w-4" />
+                <span className="ml-2">Delete</span>
+              </Button>
+            </div>
+          </div>
+        ))}
+      </CardContent>
+    </Card>
+  </div>
+)
 }
 
