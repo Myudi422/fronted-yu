@@ -10,9 +10,8 @@ import { PlayCircle, PauseCircle, Trash2, Download } from "lucide-react"
 // URL dasar API dan WebSocket
 // Mengambil URL API dan WebSocket dari file .env
 
-const API_BASE = "http://localhost:8000/api"
-const WS_URL = "ws://localhost:8000/ws"
-
+const API_BASE = `http://${window.location.hostname}:8000/api`; 
+const WS_URL = `ws://${window.location.hostname}:8000/ws`; 
 
 
 // Komponen untuk menampilkan statistik server
