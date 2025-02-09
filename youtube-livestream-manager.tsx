@@ -232,47 +232,81 @@ export default function YoutubeLivestreamManager() {
   }, []);
   
 
-  // Fungsi API untuk download, stream, toggle, dan delete
-  const handleDownload = async () => {
-    if (!driveUrl.trim()) {
-      alert("Please enter a Google Drive URL")
-      return
-    }
+  // Helper function untuk mengekstrak file ID dari URL Google Drive
+function extractFileId(url) {
+  // Cek format https://drive.google.com/open?id=FILE_ID
+  let match = url.match(/\/open\?id=([^&]+)/);
+  if (match && match[1]) return match[1];
 
-    // Validasi format URL Google Drive
-    // Format yang diinginkan: https://drive.google.com/uc?id=YOUR_FILE_ID
-    const validUrlPattern = /^https:\/\/drive\.google\.com\/uc\?id=[\w-]+$/;
-    if (!validUrlPattern.test(driveUrl.trim())) {
-      alert("Google Drive URL harus berformat:\nhttps://drive.google.com/uc?id=YOUR_FILE_ID")
-      return;
-    }
+  // Cek format https://drive.google.com/file/d/FILE_ID/view
+  match = url.match(/\/file\/d\/([^/]+)/);
+  if (match && match[1]) return match[1];
 
-    // Tampilkan popup loading
-    setIsDownloading(true)
-    try {
-      const response = await fetch(`${API_BASE}/download`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          drive_url: driveUrl,
-          custom_name: customName.trim() || null // Jika kosong, kirim null
-        })
-      })
+  // Cek format https://drive.google.com/uc?id=FILE_ID (bisa dengan parameter tambahan)
+  match = url.match(/\/uc\?id=([^&]+)/);
+  if (match && match[1]) return match[1];
 
-      const data = await response.json()
-      if (response.ok) {
-        alert(`File will be downloaded as: ${data.file_name}`)
-        // Refresh file list
-        await fetchFiles()
-      } else {
-        alert(`Error: ${data.detail}`)
-      }
-    } catch (error) {
-      console.error("Download failed:", error)
-    } finally {
-      setIsDownloading(false)
-    }
+  // Fallback: gunakan URLSearchParams untuk menangkap parameter id
+  try {
+    const urlObj = new URL(url);
+    return urlObj.searchParams.get("id");
+  } catch (error) {
+    return null;
   }
+}
+
+const handleDownload = async () => {
+  if (!driveUrl.trim()) {
+    alert("Please enter a Google Drive URL");
+    return;
+  }
+
+  // Ekstrak file ID dari URL yang dimasukkan
+  const fileId = extractFileId(driveUrl.trim());
+  if (!fileId) {
+    alert("Format URL Google Drive tidak valid.");
+    return;
+  }
+
+  // Konversi URL ke format yang diinginkan
+  const normalizedDriveUrl = `https://drive.google.com/uc?id=${fileId}`;
+
+  // (Opsional) Perbarui input field dengan URL yang sudah dikonversi agar user melihat perubahan
+  // setDriveUrl(normalizedDriveUrl);
+
+  // Validasi kembali URL yang telah dinormalisasi (meskipun seharusnya sudah valid)
+  const validUrlPattern = /^https:\/\/drive\.google\.com\/uc\?id=[\w-]+$/;
+  if (!validUrlPattern.test(normalizedDriveUrl)) {
+    alert("Google Drive URL harus berformat:\nhttps://drive.google.com/uc?id=YOUR_FILE_ID");
+    return;
+  }
+
+  // Tampilkan popup loading
+  setIsDownloading(true);
+  try {
+    const response = await fetch(`${API_BASE}/download`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        drive_url: normalizedDriveUrl, // gunakan URL yang sudah dikonversi
+        custom_name: customName.trim() || null // Jika kosong, kirim null
+      })
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+      alert(`File will be downloaded as: ${data.file_name}`);
+      // Refresh file list
+      await fetchFiles();
+    } else {
+      alert(`Error: ${data.detail}`);
+    }
+  } catch (error) {
+    console.error("Download failed:", error);
+  } finally {
+    setIsDownloading(false);
+  }
+};
 
   const handleDeleteFile = async () => {
     if (!selectedFile) {
