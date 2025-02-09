@@ -154,26 +154,6 @@ export default function YoutubeLivestreamManager() {
   // State tambahan untuk popup loading download
   const [isDownloading, setIsDownloading] = useState(false)
 
-  useEffect(() => {
-    const storedDriveUrl = localStorage.getItem("driveUrl");
-    if (storedDriveUrl) setDriveUrl(storedDriveUrl);
-    const storedYoutubeKey = localStorage.getItem("youtubeKey");
-    if (storedYoutubeKey) setYoutubeKey(storedYoutubeKey);
-    const storedCustomRtmpUrl = localStorage.getItem("customRtmpUrl");
-    if (storedCustomRtmpUrl) setCustomRtmpUrl(storedCustomRtmpUrl);
-  
-  useEffect(() => {
-    localStorage.setItem("driveUrl", driveUrl);
-    }, [driveUrl]);
-  
-  useEffect(() => {
-    localStorage.setItem("youtubeKey", youtubeKey);
-    }, [youtubeKey]);
-  
-  useEffect(() => {
-    localStorage.setItem("customRtmpUrl", customRtmpUrl);
-    }, [customRtmpUrl]);
-
   // Fungsi pembantu untuk re-fetch data
   const fetchFiles = async () => {
     try {
@@ -204,6 +184,30 @@ export default function YoutubeLivestreamManager() {
       console.error("Error fetching scheduled streams:", error)
     }
   }
+
+    // Muat nilai input yang sudah disimpan di localStorage saat komponen pertama kali dimuat
+    useEffect(() => {
+      const storedDriveUrl = localStorage.getItem("driveUrl");
+      if (storedDriveUrl) setDriveUrl(storedDriveUrl);
+  
+      const storedCustomName = localStorage.getItem("customName");
+      if (storedCustomName) setCustomName(storedCustomName);
+  
+      const storedYoutubeKey = localStorage.getItem("youtubeKey");
+      if (storedYoutubeKey) setYoutubeKey(storedYoutubeKey);
+  
+      const storedCustomRtmpUrl = localStorage.getItem("customRtmpUrl");
+      if (storedCustomRtmpUrl) setCustomRtmpUrl(storedCustomRtmpUrl);
+  
+    }, []);
+  
+  useEffect(() => {
+    localStorage.setItem("youtubeKey", youtubeKey);
+    }, [youtubeKey]);
+  
+  useEffect(() => {
+    localStorage.setItem("customRtmpUrl", customRtmpUrl);
+    }, [customRtmpUrl]);
 
   // Koneksi WebSocket untuk update realtime
   useEffect(() => {
