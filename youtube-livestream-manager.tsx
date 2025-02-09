@@ -36,7 +36,6 @@ function ServerStatsWidget() {
       }
     }
 
-    // Ambil data segera saat komponen dimount dan perbarui tiap 5 detik
     fetchStats()
     const interval = setInterval(fetchStats, 5000)
     return () => clearInterval(interval)
@@ -163,6 +162,18 @@ export default function YoutubeLivestreamManager() {
       return
     }
 
+    // Lakukan konversi URL jika diperlukan
+    let formattedUrl = driveUrl.trim()
+    // Jika URL mengandung /file/d/ berarti dalam format asal yang perlu dikonversi
+    if (formattedUrl.includes("drive.google.com/file/d/")) {
+      const match = formattedUrl.match(/\/file\/d\/([^/]+)/)
+      if (match && match[1]) {
+        const fileId = match[1]
+        formattedUrl = `https://drive.google.com/uc?id=${fileId}`
+        alert("Google Drive URL telah dikonversi ke format yang benar.")
+      }
+    }
+
     // Tampilkan popup loading
     setIsDownloading(true)
     try {
@@ -170,14 +181,14 @@ export default function YoutubeLivestreamManager() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          drive_url: driveUrl,
+          drive_url: formattedUrl,
           custom_name: customName.trim() || null // Jika kosong, kirim null
         })
       })
 
       const data = await response.json()
       if (response.ok) {
-        alert(`File will be downloaded as: ${data.file_name}`)
+        alert(`File akan diunduh dengan nama: ${data.file_name}`)
         // Refresh file list
         await fetchFiles()
       } else {
@@ -242,7 +253,7 @@ export default function YoutubeLivestreamManager() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
         })
-        alert(`Stream scheduled for: ${scheduleDate}`)
+        alert(`Stream dijadwalkan pada: ${scheduleDate}`)
         setSelectedFile("")
         setYoutubeKey("")
         setScheduleDate("")
