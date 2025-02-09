@@ -13,15 +13,16 @@ import { PlayCircle, PauseCircle, Trash2, Download } from "lucide-react"
 const PROTOCOL = window.location.protocol === "https:" ? "https" : "http";
 const WS_PROTOCOL = window.location.protocol === "https:" ? "wss" : "ws";
 
-// Cek apakah hostname mengandung "app.github.dev"
+// Jika di Codespace, jangan pakai port
 const USE_PORT = !window.location.hostname.includes("app.github.dev");
-const PORT = USE_PORT ? ":8000" : ""; // Tambahkan port jika bukan dari "app.github.dev"
+const PORT = USE_PORT ? ":8000" : ""; 
 
-const API_BASE = `${PROTOCOL}://${window.location.hostname}${PORT}/api`;
-const WS_URL = `${WS_PROTOCOL}://${window.location.hostname}${PORT}/ws`;
+const API_BASE = `${PROTOCOL}://${window.location.hostname.replace("3000", "8000")}${PORT}/api`;
+const WS_URL = `${WS_PROTOCOL}://${window.location.hostname.replace("3000", "8000")}${PORT}/ws`;
 
 console.log(API_BASE);
 console.log(WS_URL);
+
 
 
 
