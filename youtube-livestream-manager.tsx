@@ -142,6 +142,8 @@ export default function YoutubeLivestreamManager() {
   const [youtubeKey, setYoutubeKey] = useState("")
   const [scheduleType, setScheduleType] = useState("now") // "now" atau "schedule"
   const [scheduleDate, setScheduleDate] = useState("")
+    // Tambahkan state untuk memilih sumber input: "file" atau "obs"
+  const [inputSource, setInputSource] = useState("file")
   
 
   // State untuk platform
@@ -358,17 +360,18 @@ const handleDownload = async () => {
   }
 
   const handleStartStream = async () => {
-    if (!selectedFile || !youtubeKey) {
+    if (inputSource === "file" && (!selectedFile || !youtubeKey)) {
       alert("Please select a file and enter your stream key.")
       return
     }
-    if (platform === "other" && !customRtmpUrl.trim()) {
-      alert("Please enter a custom RTMP URL for 'Other' platform.")
+    if (inputSource === "obs" && !youtubeKey) {
+      alert("Please enter your stream key.")
       return
     }
 
     const payload = {
-      file: selectedFile,
+      source: inputSource,
+      file: inputSource === "file" ? selectedFile : "", // tidak diperlukan untuk OBS
       youtube_key: youtubeKey,
       platform,
       custom_rtmp_url: platform === "other" ? customRtmpUrl : null
@@ -469,51 +472,75 @@ const handleDownload = async () => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Row 1: Input Google Drive URL & Custom File Name (stacked) dan tombol Download */}
+          {/* Pilih Sumber Input: File atau OBS */}
           <div className="flex flex-col gap-2">
-            <Input
-              placeholder="Enter Google Drive URL"
-              value={driveUrl}
-              onChange={(e) => setDriveUrl(e.target.value)}
-              className="w-full"
-            />
-            <Input
-              placeholder="Custom File Name (Optional)"
-              value={customName}
-              onChange={(e) => setCustomName(e.target.value)}
-              className="w-full"
-            />
-            <Button onClick={handleDownload} disabled={!driveUrl} className="flex-none">
-              <Download className="h-4 w-4" />
-              <span className="ml-2">Download</span>
-            </Button>
-          </div>
-
-          {/* Row 2: Pilih File dan tombol Delete */}
-          <div className="flex items-center gap-2">
-            <Select
-              value={selectedFile}
-              onValueChange={(value) => setSelectedFile(value)}
-              className="flex-1"
-            >
+            <Select value={inputSource} onValueChange={(value) => setInputSource(value)} className="w-full">
               <SelectTrigger>
-                <SelectValue placeholder="Select a file" />
+                <SelectValue placeholder="Select Input Source" />
               </SelectTrigger>
               <SelectContent>
-                {files.map((file) => (
-                  <SelectItem key={file} value={file}>
-                    {file}
-                  </SelectItem>
-                ))}
+                <SelectItem value="file">File</SelectItem>
+                <SelectItem value="obs">OBS</SelectItem>
               </SelectContent>
             </Select>
-            <Button onClick={handleDeleteFile} disabled={!selectedFile} className="flex-none">
-              <Trash2 className="h-4 w-4" />
-              <span className="ml-2">Delete</span>
-            </Button>
           </div>
 
-          {/* Row 3: Input Stream Key */}
+          {/* Jika sumber input adalah file, tampilkan area download & file selection */}
+          {inputSource === "file" && (
+            <>
+              <div className="flex flex-col gap-2">
+                <Input
+                  placeholder="Enter Google Drive URL"
+                  value={driveUrl}
+                  onChange={(e) => setDriveUrl(e.target.value)}
+                  className="w-full"
+                />
+                <Input
+                  placeholder="Custom File Name (Optional)"
+                  value={customName}
+                  onChange={(e) => setCustomName(e.target.value)}
+                  className="w-full"
+                />
+                <Button onClick={handleDownload} disabled={!driveUrl} className="flex-none">
+                  <Download className="h-4 w-4" />
+                  <span className="ml-2">Download</span>
+                </Button>
+              </div>
+              <div className="flex items-center gap-2">
+                <Select
+                  value={selectedFile}
+                  onValueChange={(value) => setSelectedFile(value)}
+                  className="flex-1"
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a file" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {files.map((file) => (
+                      <SelectItem key={file} value={file}>
+                        {file}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button onClick={handleDeleteFile} disabled={!selectedFile} className="flex-none">
+                  <Trash2 className="h-4 w-4" />
+                  <span className="ml-2">Delete</span>
+                </Button>
+              </div>
+            </>
+          )}
+
+          {/* Jika sumber input adalah OBS, tampilkan pesan instruksi */}
+          {inputSource === "obs" && (
+            <div className="p-2 bg-blue-100 rounded-md">
+              <p className="text-sm">
+                Configure OBS untuk streaming ke: <strong>{`${PROTOCOL}://${window.location.hostname.replace("3000", "8000")}`}</strong> (biasanya <code>rtmp://{window.location.hostname}:1935/live/obs</code>).
+              </p>
+            </div>
+          )}
+
+          {/* Input Stream Key */}
           <Input
             placeholder="Enter Stream Key"
             value={youtubeKey}
