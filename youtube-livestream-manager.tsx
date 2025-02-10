@@ -590,12 +590,18 @@ const handleDownload = async () => {
           )}
 
           {/* Row 6: Tombol Start Stream */}
-          <Button onClick={handleStartStream} disabled={!selectedFile || !youtubeKey}>
-            <PlayCircle className="h-4 w-4" />
-            <span className="ml-2">
-              {scheduleType === "schedule" ? "Schedule Stream" : "Start Now"}
-            </span>
-          </Button>
+          <Button
+  onClick={handleStartStream}
+  disabled={
+    inputSource === "file" ? (!selectedFile || !youtubeKey) : !youtubeKey
+  }
+>
+  <PlayCircle className="h-4 w-4" />
+  <span className="ml-2">
+    {scheduleType === "schedule" ? "Schedule Stream" : "Start Now"}
+  </span>
+</Button>
+
 
           {/* Daftar Streaming Aktif */}
           <h3 className="font-semibold">Active Streams</h3>
