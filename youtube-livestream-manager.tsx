@@ -141,7 +141,8 @@ export default function YoutubeLivestreamManager() {
   const [selectedFile, setSelectedFile] = useState("")
   const [youtubeKey, setYoutubeKey] = useState("")
   const [scheduleType, setScheduleType] = useState("now") // "now" atau "schedule"
-  const [scheduleDate, setScheduleDate] = useState("")
+  const [scheduleDate, setScheduleDate] = useState(""); // waktu mulai
+  const [scheduleEndDate, setScheduleEndDate] = useState(""); // waktu berakhir
     // Tambahkan state untuk memilih sumber input: "file" atau "obs"
   const [inputSource, setInputSource] = useState("file")
   
@@ -360,59 +361,67 @@ const handleDownload = async () => {
   }
 
   const handleStartStream = async () => {
+    // Validasi untuk input OBS dan file
     if (inputSource === "file" && (!selectedFile || !youtubeKey)) {
-      alert("Please select a file and enter your stream key.")
-      return
+      alert("Please select a file and enter your stream key.");
+      return;
     }
     if (inputSource === "obs" && !youtubeKey) {
-      alert("Please enter your stream key.")
-      return
+      alert("Please enter your stream key.");
+      return;
     }
-
+  
     const payload = {
       source: inputSource,
-      file: inputSource === "file" ? selectedFile : "", // tidak diperlukan untuk OBS
+      file: inputSource === "file" ? selectedFile : "",
       youtube_key: youtubeKey,
       platform,
       custom_rtmp_url: platform === "other" ? customRtmpUrl : null
-    }
-
+    };
+  
     if (scheduleType === "schedule") {
-      if (!scheduleDate) {
-        alert("Please select a date and time for scheduling.")
-        return
+      if (!scheduleDate || !scheduleEndDate) {
+        alert("Please select both start and end date and time for scheduling.");
+        return;
       }
-      payload.schedule_time = scheduleDate
+      if (new Date(scheduleEndDate) <= new Date(scheduleDate)) {
+        alert("End time must be after start time.");
+        return;
+      }
+      payload.schedule_time = scheduleDate;
+      payload.schedule_end_time = scheduleEndDate;
       try {
         await fetch(`${API_BASE}/scheduled`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
-        })
-        alert(`Stream scheduled for: ${scheduleDate}`)
-        setSelectedFile("")
-        setYoutubeKey("")
-        setScheduleDate("")
-        await fetchScheduledStreams()
+        });
+        alert(`Stream scheduled from:\n${scheduleDate} until ${scheduleEndDate}`);
+        setSelectedFile("");
+        setYoutubeKey("");
+        setScheduleDate("");
+        setScheduleEndDate("");
+        await fetchScheduledStreams();
       } catch (error) {
-        alert("Error scheduling stream")
+        alert("Error scheduling stream");
       }
-      return
+      return;
     }
-
+  
+    // Jika tidak dijadwalkan, langsung start stream
     try {
       await fetch(`${API_BASE}/streams`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
-      })
-      setSelectedFile("")
-      setYoutubeKey("")
-      await fetchStreams()
+      });
+      setSelectedFile("");
+      setYoutubeKey("");
+      await fetchStreams();
     } catch (error) {
-      alert("Error starting stream")
+      alert("Error starting stream");
     }
-  }
+  };
 
   const handleToggleStream = async (id) => {
     try {
@@ -570,24 +579,36 @@ const handleDownload = async () => {
           )}
 
           {/* Row 5: Pilih Jadwal */}
-          <Select value={scheduleType} onValueChange={setScheduleType} className="w-full">
-            <SelectTrigger>
-              <SelectValue placeholder="Select Schedule Type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="now">Now</SelectItem>
-              <SelectItem value="schedule">Schedule - Local Time</SelectItem>
-            </SelectContent>
-          </Select>
+          {/* Row 5: Pilih Jadwal */}
+<Select value={scheduleType} onValueChange={setScheduleType} className="w-full">
+  <SelectTrigger>
+    <SelectValue placeholder="Select Schedule Type" />
+  </SelectTrigger>
+  <SelectContent>
+    <SelectItem value="now">Now</SelectItem>
+    <SelectItem value="schedule">Schedule - Local Time</SelectItem>
+  </SelectContent>
+</Select>
 
-          {scheduleType === "schedule" && (
-            <Input
-              type="datetime-local"
-              value={scheduleDate}
-              onChange={(e) => setScheduleDate(e.target.value)}
-              className="w-full"
-            />
-          )}
+{scheduleType === "schedule" && (
+  <>
+    <Input
+      type="datetime-local"
+      value={scheduleDate}
+      onChange={(e) => setScheduleDate(e.target.value)}
+      className="w-full"
+      placeholder="Start Date and Time"
+    />
+    <Input
+      type="datetime-local"
+      value={scheduleEndDate}
+      onChange={(e) => setScheduleEndDate(e.target.value)}
+      className="w-full"
+      placeholder="End Date and Time"
+    />
+  </>
+)}
+
 
           {/* Row 6: Tombol Start Stream */}
           <Button
@@ -635,31 +656,34 @@ const handleDownload = async () => {
             </div>
           ))}
 
-          {/* Daftar Streaming yang Dijadwalkan */}
-          <h3 className="font-semibold">Scheduled Streams</h3>
-          {scheduledStreams.map((stream) => (
-            <div
-              key={stream.id}
-              className="p-4 bg-yellow-100 rounded-md flex items-center justify-between"
-            >
-              <p className="truncate flex-1">
-                {stream.file} -{" "}
-                {new Date(stream.schedule_time).toLocaleString(navigator.language, {
-  timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-})}
-              </p>
-              <div className="flex gap-2">
-                <Button onClick={() => handleStartScheduledStream(stream.id)}>
-                  <PlayCircle className="h-4 w-4" />
-                  <span className="ml-2">Start Now</span>
-                </Button>
-                <Button onClick={() => handleDeleteScheduledStream(stream.id)}>
-                  <Trash2 className="h-4 w-4" />
-                  <span className="ml-2">Delete</span>
-                </Button>
-              </div>
-            </div>
-          ))}
+<h3 className="font-semibold">Scheduled Streams</h3>
+{scheduledStreams.map((stream) => (
+  <div
+    key={stream.id}
+    className="p-4 bg-yellow-100 rounded-md flex items-center justify-between"
+  >
+    <p className="truncate flex-1">
+      {stream.file} -{" "}
+      {new Date(stream.schedule_time).toLocaleString(navigator.language, {
+        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      })}
+      {" "} to {" "}
+      {new Date(stream.schedule_end_time).toLocaleString(navigator.language, {
+        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      })}
+    </p>
+    <div className="flex gap-2">
+      <Button onClick={() => handleStartScheduledStream(stream.id)}>
+        <PlayCircle className="h-4 w-4" />
+        <span className="ml-2">Start Now</span>
+      </Button>
+      <Button onClick={() => handleDeleteScheduledStream(stream.id)}>
+        <Trash2 className="h-4 w-4" />
+        <span className="ml-2">Delete</span>
+      </Button>
+    </div>
+  </div>
+))}
         </CardContent>
       </Card>
       <footer className="w-full py-4 bg-gray-900 text-white text-center text-sm mt-8">
