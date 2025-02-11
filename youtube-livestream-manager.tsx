@@ -145,6 +145,13 @@ export default function YoutubeLivestreamManager() {
   const [scheduleEndDate, setScheduleEndDate] = useState(""); // waktu berakhir
     // Tambahkan state untuk memilih sumber input: "file" atau "obs"
   const [inputSource, setInputSource] = useState("file")
+
+  const maskStreamKey = (key) => {
+    if (!key) return "";
+    const visibleChars = 4;
+    const maskedPart = "*".repeat(key.length - visibleChars);
+    return key.slice(0, visibleChars) + maskedPart;
+  };
   
 
   // State untuk platform
@@ -625,36 +632,47 @@ const handleDownload = async () => {
 
 
           {/* Daftar Streaming Aktif */}
-          <h3 className="font-semibold">Active Streams</h3>
-          {streams.map((stream) => (
-            <div
-              key={stream.id}
-              className="p-4 bg-gray-100 rounded-md flex items-center justify-between"
-            >
-              <p className="truncate flex-1">
-                {stream.file} ({stream.youtube_key})
-              </p>
-              <div className="flex gap-2">
-                <Button onClick={() => handleToggleStream(stream.id)}>
-                  {stream.active ? (
-                    <>
-                      <PauseCircle className="h-4 w-4" />
-                      <span className="ml-2">Pause</span>
-                    </>
-                  ) : (
-                    <>
-                      <PlayCircle className="h-4 w-4" />
-                      <span className="ml-2">Play</span>
-                    </>
-                  )}
-                </Button>
-                <Button onClick={() => handleDeleteStream(stream.id)}>
-                  <Trash2 className="h-4 w-4" />
-                  <span className="ml-2">Delete</span>
-                </Button>
-              </div>
-            </div>
-          ))}
+<h3 className="font-semibold">Active Streams</h3>
+{streams.map((stream) => (
+  <div
+    key={stream.id}
+    className="p-4 bg-gray-100 rounded-md flex items-center justify-between"
+  >
+    <div className="flex flex-col">
+      <p className="truncate">
+        {stream.file} (<span>{maskStreamKey(stream.youtube_key)}</span>)
+      </p>
+      {stream.schedule_end_time && (
+        <p className="text-xs text-gray-500">
+          Ends at:{" "}
+          {new Date(stream.schedule_end_time).toLocaleString(navigator.language, {
+            timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          })}
+        </p>
+      )}
+    </div>
+    <div className="flex gap-2">
+      <Button onClick={() => handleToggleStream(stream.id)}>
+        {stream.active ? (
+          <>
+            <PauseCircle className="h-4 w-4" />
+            <span className="ml-2">Pause</span>
+          </>
+        ) : (
+          <>
+            <PlayCircle className="h-4 w-4" />
+            <span className="ml-2">Play</span>
+          </>
+        )}
+      </Button>
+      <Button onClick={() => handleDeleteStream(stream.id)}>
+        <Trash2 className="h-4 w-4" />
+        <span className="ml-2">Delete</span>
+      </Button>
+    </div>
+  </div>
+))}
+
 
 <h3 className="font-semibold">Scheduled Streams</h3>
 {scheduledStreams.map((stream) => (
@@ -684,6 +702,7 @@ const handleDownload = async () => {
     </div>
   </div>
 ))}
+
         </CardContent>
       </Card>
       <footer className="w-full py-4 bg-gray-900 text-white text-center text-sm mt-8">
