@@ -632,13 +632,14 @@ function YoutubeLivestreamManagerMain() {
                   {stream.file} (<span>{maskStreamKey(stream.youtube_key)}</span>)
                 </p>
                 {stream.schedule_end_time && (
-                  <p className="text-xs text-gray-500">
-                    Ends at:{" "}
-                    {new Date(stream.schedule_end_time).toLocaleString(navigator.language, {
-                      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                    })}
-                  </p>
-                )}
+  <p className="text-xs text-gray-500">
+    Ends at:{" "}
+    {new Date(stream.schedule_end_time).toLocaleString(navigator.language, {
+      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    })}
+  </p>
+)}
+
               </div>
               <div className="flex gap-2">
                 <Button onClick={() => handleToggleStream(stream.id)}>
