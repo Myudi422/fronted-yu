@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { PlayCircle, PauseCircle, Trash2, Download } from "lucide-react"
-import { Progress } from "@/components/ui/progress";
-import { Cpu, HardDrive, MemoryStick, Clock, Play, Calendar } from "lucide-react";
+import { Progress } from "@/components/ui/progress"
+import { Cpu, HardDrive, MemoryStick, Clock, Play, Calendar } from "lucide-react"
 
 // URL dasar API dan WebSocket
 const PROTOCOL = window.location.protocol === "https:" ? "https" : "http";
@@ -22,7 +22,6 @@ const WS_URL = `${WS_PROTOCOL}://${window.location.hostname.replace("3000", "800
 
 console.log(API_BASE);
 console.log(WS_URL);
-
 
 function ServerStatsWidget() {
   const [stats, setStats] = useState({
@@ -44,7 +43,6 @@ function ServerStatsWidget() {
         setStats(data);
       } catch (error) {
         console.error("Error fetching server stats:", error);
-        // Biarkan stats tetap dengan nilai default jika terjadi error
       }
     }
 
@@ -53,87 +51,124 @@ function ServerStatsWidget() {
     return () => clearInterval(interval);
   }, []);
 
-// Data untuk ditampilkan
-const statsData = [
-  {
-    icon: <Cpu className="w-6 h-6 text-blue-500" />,
-    label: "CPU Usage",
-    value: `${stats.cpu_percent}%`,
-    progress: stats.cpu_percent,
-  },
-  {
-    icon: <MemoryStick className="w-6 h-6 text-green-500" />,
-    label: "Memory Usage",
-    value: `${stats.memory.percent}% (${(stats.memory.used / (1024 * 1024)).toFixed(2)} MB / ${(stats.memory.total / (1024 * 1024)).toFixed(2)} MB)`,
-    progress: stats.memory.percent,
-  },
-  {
-    icon: <HardDrive className="w-6 h-6 text-red-500" />,
-    label: "Disk Usage",
-    value: `${stats.disk.percent}% (${(stats.disk.used / (1024 * 1024 * 1024)).toFixed(2)} GB / ${(stats.disk.total / (1024 * 1024 * 1024)).toFixed(2)} GB)`,
-    progress: stats.disk.percent,
-  },
-  {
-    icon: <Clock className="w-6 h-6 text-yellow-500" />,
-    label: "Uptime",
-    value: stats.uptime,
-  },
-  {
-    icon: <Play className="w-6 h-6 text-purple-500" />,
-    label: "Active Streams",
-    value: stats.active_streams,
-  },
-  {
-    icon: <Calendar className="w-6 h-6 text-orange-500" />,
-    label: "Scheduled Streams",
-    value: stats.scheduled_streams,
-  },
-  {
-    icon: <Download className="w-6 h-6 text-teal-500" />,
-    label: "Downloaded Files",
-    value: stats.downloaded_files,
-  },
-];
+  // Data untuk ditampilkan
+  const statsData = [
+    {
+      icon: <Cpu className="w-6 h-6 text-blue-500" />,
+      label: "CPU Usage",
+      value: `${stats.cpu_percent}%`,
+      progress: stats.cpu_percent,
+    },
+    {
+      icon: <MemoryStick className="w-6 h-6 text-green-500" />,
+      label: "Memory Usage",
+      value: `${stats.memory.percent}% (${(stats.memory.used / (1024 * 1024)).toFixed(2)} MB / ${(stats.memory.total / (1024 * 1024)).toFixed(2)} MB)`,
+      progress: stats.memory.percent,
+    },
+    {
+      icon: <HardDrive className="w-6 h-6 text-red-500" />,
+      label: "Disk Usage",
+      value: `${stats.disk.percent}% (${(stats.disk.used / (1024 * 1024 * 1024)).toFixed(2)} GB / ${(stats.disk.total / (1024 * 1024 * 1024)).toFixed(2)} GB)`,
+      progress: stats.disk.percent,
+    },
+    {
+      icon: <Clock className="w-6 h-6 text-yellow-500" />,
+      label: "Uptime",
+      value: stats.uptime,
+    },
+    {
+      icon: <Play className="w-6 h-6 text-purple-500" />,
+      label: "Active Streams",
+      value: stats.active_streams,
+    },
+    {
+      icon: <Calendar className="w-6 h-6 text-orange-500" />,
+      label: "Scheduled Streams",
+      value: stats.scheduled_streams,
+    },
+    {
+      icon: <Download className="w-6 h-6 text-teal-500" />,
+      label: "Downloaded Files",
+      value: stats.downloaded_files,
+    },
+  ];
 
-return (
-  <Card className="p-4">
-    <CardHeader>
-      <CardTitle>Server Stats</CardTitle>
-    </CardHeader>
-    <CardContent>
-      {/* Grid Responsif: 1 kolom di mobile, 2 di tablet, 3 & 4 di desktop */}
-      <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-        {/* Baris Pertama (3 item) */}
-        {statsData.slice(0, 3).map((stat, index) => (
-          <div key={index} className="flex items-center gap-2 p-2 bg-gray-100 rounded-md">
-            {stat.icon}
-            <div className="w-full">
-              <p className="text-sm font-medium">{stat.label}: {stat.value}</p>
-              {stat.progress !== undefined && <Progress value={stat.progress} />}
+  return (
+    <Card className="p-4">
+      <CardHeader>
+        <CardTitle>Server Stats</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {/* Grid Responsif: 1 kolom di mobile, 2 di tablet, 3 & 4 di desktop */}
+        <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+          {statsData.slice(0, 3).map((stat, index) => (
+            <div key={index} className="flex items-center gap-2 p-2 bg-gray-100 rounded-md">
+              {stat.icon}
+              <div className="w-full">
+                <p className="text-sm font-medium">{stat.label}: {stat.value}</p>
+                {stat.progress !== undefined && <Progress value={stat.progress} />}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
-      
-      {/* Baris Kedua (4 item) */}
-      <div className="grid gap-4 mt-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
-        {statsData.slice(3).map((stat, index) => (
-          <div key={index + 3} className="flex items-center gap-2 p-2 bg-gray-100 rounded-md">
-            {stat.icon}
-            <div className="w-full">
-              <p className="text-sm font-medium">{stat.label}: {stat.value}</p>
-              {stat.progress !== undefined && <Progress value={stat.progress} />}
+          ))}
+        </div>
+        
+        <div className="grid gap-4 mt-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+          {statsData.slice(3).map((stat, index) => (
+            <div key={index + 3} className="flex items-center gap-2 p-2 bg-gray-100 rounded-md">
+              {stat.icon}
+              <div className="w-full">
+                <p className="text-sm font-medium">{stat.label}: {stat.value}</p>
+                {stat.progress !== undefined && <Progress value={stat.progress} />}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
-    </CardContent>
-  </Card>
-);
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
 }
 
-
 export default function YoutubeLivestreamManager() {
+  // =========================
+  // POPUP LOGIN IMPLEMENTATION
+  // =========================
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loginPassword, setLoginPassword] = useState("");
+  const [loginError, setLoginError] = useState("");
+
+  const handleLogin = () => {
+    if (loginPassword === "trial-yukstream") {
+      setIsAuthenticated(true);
+    } else {
+      setLoginError("Password salah. Coba lagi.");
+    }
+  };
+
+  // Jika belum login, tampilkan popup login
+  if (!isAuthenticated) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75 z-50">
+        <div className="bg-white p-6 rounded shadow-md w-80">
+          <h2 className="text-2xl font-bold mb-4 text-center">Login</h2>
+          <Input
+            type="password"
+            placeholder="Enter password"
+            value={loginPassword}
+            onChange={(e) => setLoginPassword(e.target.value)}
+          />
+          {loginError && <p className="text-red-500 mt-2 text-center">{loginError}</p>}
+          <Button onClick={handleLogin} className="mt-4 w-full">
+            Login
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // =========================
+  // KODE HALAMAN UTAMA
+  // =========================
+
   // State untuk livestream manager
   const [driveUrl, setDriveUrl] = useState("")
   const [customName, setCustomName] = useState("")
@@ -141,9 +176,9 @@ export default function YoutubeLivestreamManager() {
   const [selectedFile, setSelectedFile] = useState("")
   const [youtubeKey, setYoutubeKey] = useState("")
   const [scheduleType, setScheduleType] = useState("now") // "now" atau "schedule"
-  const [scheduleDate, setScheduleDate] = useState(""); // waktu mulai
-  const [scheduleEndDate, setScheduleEndDate] = useState(""); // waktu berakhir
-    // Tambahkan state untuk memilih sumber input: "file" atau "obs"
+  const [scheduleDate, setScheduleDate] = useState("") // waktu mulai
+  const [scheduleEndDate, setScheduleEndDate] = useState("") // waktu berakhir
+  // Tambahkan state untuk memilih sumber input: "file" atau "obs"
   const [inputSource, setInputSource] = useState("file")
 
   const maskStreamKey = (key) => {
@@ -153,7 +188,6 @@ export default function YoutubeLivestreamManager() {
     return key.slice(0, visibleChars) + maskedPart;
   };
   
-
   // State untuk platform
   const [platform, setPlatform] = useState("youtube")
   const [customRtmpUrl, setCustomRtmpUrl] = useState("")
@@ -195,29 +229,28 @@ export default function YoutubeLivestreamManager() {
     }
   }
 
-    // Muat nilai input yang sudah disimpan di localStorage saat komponen pertama kali dimuat
-    useEffect(() => {
-      const storedDriveUrl = localStorage.getItem("driveUrl");
-      if (storedDriveUrl) setDriveUrl(storedDriveUrl);
-  
-      const storedCustomName = localStorage.getItem("customName");
-      if (storedCustomName) setCustomName(storedCustomName);
-  
-      const storedYoutubeKey = localStorage.getItem("youtubeKey");
-      if (storedYoutubeKey) setYoutubeKey(storedYoutubeKey);
-  
-      const storedCustomRtmpUrl = localStorage.getItem("customRtmpUrl");
-      if (storedCustomRtmpUrl) setCustomRtmpUrl(storedCustomRtmpUrl);
-  
-    }, []);
-  
+  // Muat nilai input yang sudah disimpan di localStorage saat komponen pertama kali dimuat
+  useEffect(() => {
+    const storedDriveUrl = localStorage.getItem("driveUrl");
+    if (storedDriveUrl) setDriveUrl(storedDriveUrl);
+
+    const storedCustomName = localStorage.getItem("customName");
+    if (storedCustomName) setCustomName(storedCustomName);
+
+    const storedYoutubeKey = localStorage.getItem("youtubeKey");
+    if (storedYoutubeKey) setYoutubeKey(storedYoutubeKey);
+
+    const storedCustomRtmpUrl = localStorage.getItem("customRtmpUrl");
+    if (storedCustomRtmpUrl) setCustomRtmpUrl(storedCustomRtmpUrl);
+  }, []);
+
   useEffect(() => {
     localStorage.setItem("youtubeKey", youtubeKey);
-    }, [youtubeKey]);
-  
+  }, [youtubeKey]);
+
   useEffect(() => {
     localStorage.setItem("customRtmpUrl", customRtmpUrl);
-    }, [customRtmpUrl]);
+  }, [customRtmpUrl]);
 
   // Koneksi WebSocket untuk update realtime
   useEffect(() => {
@@ -250,7 +283,6 @@ export default function YoutubeLivestreamManager() {
     }
     return () => ws.close()
   }, [])
-  
 
   // Fetch data awal
   useEffect(() => {
@@ -266,83 +298,70 @@ export default function YoutubeLivestreamManager() {
     }, 5000);
     return () => clearInterval(interval);
   }, []);
-  
 
   // Helper function untuk mengekstrak file ID dari URL Google Drive
-function extractFileId(url) {
-  // Cek format https://drive.google.com/open?id=FILE_ID
-  let match = url.match(/\/open\?id=([^&]+)/);
-  if (match && match[1]) return match[1];
+  function extractFileId(url) {
+    let match = url.match(/\/open\?id=([^&]+)/);
+    if (match && match[1]) return match[1];
 
-  // Cek format https://drive.google.com/file/d/FILE_ID/view
-  match = url.match(/\/file\/d\/([^/]+)/);
-  if (match && match[1]) return match[1];
+    match = url.match(/\/file\/d\/([^/]+)/);
+    if (match && match[1]) return match[1];
 
-  // Cek format https://drive.google.com/uc?id=FILE_ID (bisa dengan parameter tambahan)
-  match = url.match(/\/uc\?id=([^&]+)/);
-  if (match && match[1]) return match[1];
+    match = url.match(/\/uc\?id=([^&]+)/);
+    if (match && match[1]) return match[1];
 
-  // Fallback: gunakan URLSearchParams untuk menangkap parameter id
-  try {
-    const urlObj = new URL(url);
-    return urlObj.searchParams.get("id");
-  } catch (error) {
-    return null;
-  }
-}
-
-const handleDownload = async () => {
-  if (!driveUrl.trim()) {
-    alert("Please enter a Google Drive URL");
-    return;
-  }
-
-  // Ekstrak file ID dari URL yang dimasukkan
-  const fileId = extractFileId(driveUrl.trim());
-  if (!fileId) {
-    alert("Format URL Google Drive tidak valid.");
-    return;
-  }
-
-  // Konversi URL ke format yang diinginkan
-  const normalizedDriveUrl = `https://drive.google.com/uc?id=${fileId}`;
-
-  // (Opsional) Perbarui input field dengan URL yang sudah dikonversi agar user melihat perubahan
-  // setDriveUrl(normalizedDriveUrl);
-
-  // Validasi kembali URL yang telah dinormalisasi (meskipun seharusnya sudah valid)
-  const validUrlPattern = /^https:\/\/drive\.google\.com\/uc\?id=[\w-]+$/;
-  if (!validUrlPattern.test(normalizedDriveUrl)) {
-    alert("Google Drive URL harus berformat:\nhttps://drive.google.com/uc?id=YOUR_FILE_ID");
-    return;
-  }
-
-  // Tampilkan popup loading
-  setIsDownloading(true);
-  try {
-    const response = await fetch(`${API_BASE}/download`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        drive_url: normalizedDriveUrl, // gunakan URL yang sudah dikonversi
-        custom_name: customName.trim() || null // Jika kosong, kirim null
-      })
-    });
-
-    const data = await response.json();
-    if (response.ok) {
-      alert(`File will be downloaded as: ${data.file_name}`);
-      // Refresh file list
-      await fetchFiles();
-    } else {
-      alert(`Error: ${data.detail}`);
+    try {
+      const urlObj = new URL(url);
+      return urlObj.searchParams.get("id");
+    } catch (error) {
+      return null;
     }
-  } catch (error) {
-    console.error("Download failed:", error);
-  } finally {
-    setIsDownloading(false);
   }
-};
+
+  const handleDownload = async () => {
+    if (!driveUrl.trim()) {
+      alert("Please enter a Google Drive URL");
+      return;
+    }
+
+    const fileId = extractFileId(driveUrl.trim());
+    if (!fileId) {
+      alert("Format URL Google Drive tidak valid.");
+      return;
+    }
+
+    const normalizedDriveUrl = `https://drive.google.com/uc?id=${fileId}`;
+
+    const validUrlPattern = /^https:\/\/drive\.google\.com\/uc\?id=[\w-]+$/;
+    if (!validUrlPattern.test(normalizedDriveUrl)) {
+      alert("Google Drive URL harus berformat:\nhttps://drive.google.com/uc?id=YOUR_FILE_ID");
+      return;
+    }
+
+    setIsDownloading(true);
+    try {
+      const response = await fetch(`${API_BASE}/download`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          drive_url: normalizedDriveUrl,
+          custom_name: customName.trim() || null
+        })
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        alert(`File will be downloaded as: ${data.file_name}`);
+        await fetchFiles();
+      } else {
+        alert(`Error: ${data.detail}`);
+      }
+    } catch (error) {
+      console.error("Download failed:", error);
+    } finally {
+      setIsDownloading(false);
+    }
+  };
 
   const handleDeleteFile = async () => {
     if (!selectedFile) {
@@ -368,7 +387,6 @@ const handleDownload = async () => {
   }
 
   const handleStartStream = async () => {
-    // Validasi untuk input OBS dan file
     if (inputSource === "file" && (!selectedFile || !youtubeKey)) {
       alert("Please select a file and enter your stream key.");
       return;
@@ -378,14 +396,12 @@ const handleDownload = async () => {
       return;
     }
   
-    // Jika mode scheduling, lakukan validasi waktu
     if (scheduleType === "schedule") {
       if (!scheduleDate || !scheduleEndDate) {
         alert("Please select both start and end date and time for scheduling.");
         return;
       }
       
-      // Parsing waktu dari input (pastikan format ISO valid, misal: 2025-02-12T18:00)
       const startTime = new Date(scheduleDate);
       const endTime = new Date(scheduleEndDate);
       const now = new Date();
@@ -442,7 +458,6 @@ const handleDownload = async () => {
       alert("Error starting stream");
     }
   };
-  
 
   const handleToggleStream = async (id) => {
     try {
@@ -483,7 +498,6 @@ const handleDownload = async () => {
 
   return (
     <div className="container mx-auto p-4 space-y-6">
-      {/* Popup loading download */}
       {isDownloading && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
           <div className="bg-white p-4 rounded-md shadow-md">
@@ -492,7 +506,6 @@ const handleDownload = async () => {
         </div>
       )}
 
-      {/* Widget Server Stats */}
       <ServerStatsWidget />
 
       <Card>
@@ -502,7 +515,6 @@ const handleDownload = async () => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Pilih Sumber Input: File atau OBS */}
           <div className="flex flex-col gap-2">
             <Select value={inputSource} onValueChange={(value) => setInputSource(value)} className="w-full">
               <SelectTrigger>
@@ -515,7 +527,6 @@ const handleDownload = async () => {
             </Select>
           </div>
 
-          {/* Jika sumber input adalah file, tampilkan area download & file selection */}
           {inputSource === "file" && (
             <>
               <div className="flex flex-col gap-2">
@@ -561,16 +572,14 @@ const handleDownload = async () => {
             </>
           )}
 
-          {/* Jika sumber input adalah OBS, tampilkan pesan instruksi */}
           {inputSource === "obs" && (
             <div className="p-2 bg-blue-100 rounded-md">
               <p className="text-sm">
-              Configure OBS to stream to: <code>rtmp://{window.location.hostname}/live/</code>.
+                Configure OBS to stream to: <code>rtmp://{window.location.hostname}/live/</code>.
               </p>
             </div>
           )}
 
-          {/* Input Stream Key */}
           <Input
             placeholder="Enter Stream Key"
             value={youtubeKey}
@@ -578,7 +587,6 @@ const handleDownload = async () => {
             className="w-full"
           />
 
-          {/* Row 4: Pilih Platform */}
           <Select value={platform} onValueChange={(value) => setPlatform(value)} className="w-full">
             <SelectTrigger>
               <SelectValue placeholder="Select Platform" />
@@ -599,132 +607,122 @@ const handleDownload = async () => {
             />
           )}
 
-          {/* Row 5: Pilih Jadwal */}
-          {/* Row 5: Pilih Jadwal */}
-<Select value={scheduleType} onValueChange={setScheduleType} className="w-full">
-  <SelectTrigger>
-    <SelectValue placeholder="Select Schedule Type" />
-  </SelectTrigger>
-  <SelectContent>
-    <SelectItem value="now">Now</SelectItem>
-    <SelectItem value="schedule">Schedule - Local Time</SelectItem>
-  </SelectContent>
-</Select>
+          <Select value={scheduleType} onValueChange={setScheduleType} className="w-full">
+            <SelectTrigger>
+              <SelectValue placeholder="Select Schedule Type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="now">Now</SelectItem>
+              <SelectItem value="schedule">Schedule - Local Time</SelectItem>
+            </SelectContent>
+          </Select>
 
-{scheduleType === "schedule" && (
-  <>
-    <Input
-      type="datetime-local"
-      value={scheduleDate}
-      onChange={(e) => setScheduleDate(e.target.value)}
-      className="w-full"
-      placeholder="Start Date and Time"
-    />
-    <Input
-      type="datetime-local"
-      value={scheduleEndDate}
-      onChange={(e) => setScheduleEndDate(e.target.value)}
-      className="w-full"
-      placeholder="End Date and Time"
-    />
-  </>
-)}
+          {scheduleType === "schedule" && (
+            <>
+              <Input
+                type="datetime-local"
+                value={scheduleDate}
+                onChange={(e) => setScheduleDate(e.target.value)}
+                className="w-full"
+                placeholder="Start Date and Time"
+              />
+              <Input
+                type="datetime-local"
+                value={scheduleEndDate}
+                onChange={(e) => setScheduleEndDate(e.target.value)}
+                className="w-full"
+                placeholder="End Date and Time"
+              />
+            </>
+          )}
 
-
-          {/* Row 6: Tombol Start Stream */}
           <Button
-  onClick={handleStartStream}
-  disabled={
-    inputSource === "file" ? (!selectedFile || !youtubeKey) : !youtubeKey
-  }
->
-  <PlayCircle className="h-4 w-4" />
-  <span className="ml-2">
-    {scheduleType === "schedule" ? "Schedule Stream" : "Start Now"}
-  </span>
-</Button>
-
-
-          {/* Daftar Streaming Aktif */}
-<h3 className="font-semibold">Active Streams</h3>
-{streams.map((stream) => (
-  <div
-    key={stream.id}
-    className="p-4 bg-gray-100 rounded-md flex items-center justify-between"
-  >
-    <div className="flex flex-col">
-      <p className="truncate">
-        {stream.file} (<span>{maskStreamKey(stream.youtube_key)}</span>)
-      </p>
-      {stream.schedule_end_time && (
-        <p className="text-xs text-gray-500">
-          Ends at:{" "}
-          {new Date(stream.schedule_end_time).toLocaleString(navigator.language, {
-            timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-          })}
-        </p>
-      )}
-    </div>
-    <div className="flex gap-2">
-      <Button onClick={() => handleToggleStream(stream.id)}>
-        {stream.active ? (
-          <>
-            <PauseCircle className="h-4 w-4" />
-            <span className="ml-2">Pause</span>
-          </>
-        ) : (
-          <>
+            onClick={handleStartStream}
+            disabled={inputSource === "file" ? (!selectedFile || !youtubeKey) : !youtubeKey}
+          >
             <PlayCircle className="h-4 w-4" />
-            <span className="ml-2">Play</span>
-          </>
-        )}
-      </Button>
-      <Button onClick={() => handleDeleteStream(stream.id)}>
-        <Trash2 className="h-4 w-4" />
-        <span className="ml-2">Delete</span>
-      </Button>
-    </div>
-  </div>
-))}
+            <span className="ml-2">
+              {scheduleType === "schedule" ? "Schedule Stream" : "Start Now"}
+            </span>
+          </Button>
 
+          <h3 className="font-semibold">Active Streams</h3>
+          {streams.map((stream) => (
+            <div
+              key={stream.id}
+              className="p-4 bg-gray-100 rounded-md flex items-center justify-between"
+            >
+              <div className="flex flex-col">
+                <p className="truncate">
+                  {stream.file} (<span>{maskStreamKey(stream.youtube_key)}</span>)
+                </p>
+                {stream.schedule_end_time && (
+                  <p className="text-xs text-gray-500">
+                    Ends at:{" "}
+                    {new Date(stream.schedule_end_time).toLocaleString(navigator.language, {
+                      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                    })}
+                  </p>
+                )}
+              </div>
+              <div className="flex gap-2">
+                <Button onClick={() => handleToggleStream(stream.id)}>
+                  {stream.active ? (
+                    <>
+                      <PauseCircle className="h-4 w-4" />
+                      <span className="ml-2">Pause</span>
+                    </>
+                  ) : (
+                    <>
+                      <PlayCircle className="h-4 w-4" />
+                      <span className="ml-2">Play</span>
+                    </>
+                  )}
+                </Button>
+                <Button onClick={() => handleDeleteStream(stream.id)}>
+                  <Trash2 className="h-4 w-4" />
+                  <span className="ml-2">Delete</span>
+                </Button>
+              </div>
+            </div>
+          ))}
 
-<h3 className="font-semibold">Scheduled Streams</h3>
-{scheduledStreams.map((stream) => (
-  <div
-    key={stream.id}
-    className="p-4 bg-yellow-100 rounded-md flex items-center justify-between"
-  >
-    <p className="truncate flex-1">
-      {stream.file} -{" "}
-      {new Date(stream.schedule_time).toLocaleString(navigator.language, {
-        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      })}
-      {" "} to {" "}
-      {new Date(stream.schedule_end_time).toLocaleString(navigator.language, {
-        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      })}
-    </p>
-    <div className="flex gap-2">
-      <Button onClick={() => handleStartScheduledStream(stream.id)}>
-        <PlayCircle className="h-4 w-4" />
-        <span className="ml-2">Start Now</span>
-      </Button>
-      <Button onClick={() => handleDeleteScheduledStream(stream.id)}>
-        <Trash2 className="h-4 w-4" />
-        <span className="ml-2">Delete</span>
-      </Button>
-    </div>
-  </div>
-))}
+          <h3 className="font-semibold">Scheduled Streams</h3>
+          {scheduledStreams.map((stream) => (
+            <div
+              key={stream.id}
+              className="p-4 bg-yellow-100 rounded-md flex items-center justify-between"
+            >
+              <p className="truncate flex-1">
+                {stream.file} -{" "}
+                {new Date(stream.schedule_time).toLocaleString(navigator.language, {
+                  timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                })}
+                {" "} to {" "}
+                {new Date(stream.schedule_end_time).toLocaleString(navigator.language, {
+                  timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                })}
+              </p>
+              <div className="flex gap-2">
+                <Button onClick={() => handleStartScheduledStream(stream.id)}>
+                  <PlayCircle className="h-4 w-4" />
+                  <span className="ml-2">Start Now</span>
+                </Button>
+                <Button onClick={() => handleDeleteScheduledStream(stream.id)}>
+                  <Trash2 className="h-4 w-4" />
+                  <span className="ml-2">Delete</span>
+                </Button>
+              </div>
+            </div>
+          ))}
 
         </CardContent>
       </Card>
       <footer className="w-full py-4 bg-gray-900 text-white text-center text-sm mt-8">
-      <p>
-        Made with ❤️ by <span className="font-semibold">YukStream</span> &copy; 2025
-      </p>
-    </footer>
+        <p>
+          Made with ❤️ by <span className="font-semibold">YukStream</span> &copy; 2025
+        </p>
+      </footer>
     </div>
-    
   )
 }
