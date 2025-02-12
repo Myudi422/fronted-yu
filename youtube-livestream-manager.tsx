@@ -378,6 +378,28 @@ const handleDownload = async () => {
       return;
     }
   
+    // Jika mode scheduling, lakukan validasi waktu
+    if (scheduleType === "schedule") {
+      if (!scheduleDate || !scheduleEndDate) {
+        alert("Please select both start and end date and time for scheduling.");
+        return;
+      }
+      
+      // Parsing waktu dari input (pastikan format ISO valid, misal: 2025-02-12T18:00)
+      const startTime = new Date(scheduleDate);
+      const endTime = new Date(scheduleEndDate);
+      const now = new Date();
+      
+      if (startTime < now) {
+        alert("Start time must be in the future.");
+        return;
+      }
+      if (endTime <= startTime) {
+        alert("End time must be after start time.");
+        return;
+      }
+    }
+  
     const payload = {
       source: inputSource,
       file: inputSource === "file" ? selectedFile : "",
@@ -387,14 +409,6 @@ const handleDownload = async () => {
     };
   
     if (scheduleType === "schedule") {
-      if (!scheduleDate || !scheduleEndDate) {
-        alert("Please select both start and end date and time for scheduling.");
-        return;
-      }
-      if (new Date(scheduleEndDate) <= new Date(scheduleDate)) {
-        alert("End time must be after start time.");
-        return;
-      }
       payload.schedule_time = scheduleDate;
       payload.schedule_end_time = scheduleEndDate;
       try {
@@ -415,7 +429,6 @@ const handleDownload = async () => {
       return;
     }
   
-    // Jika tidak dijadwalkan, langsung start stream
     try {
       await fetch(`${API_BASE}/streams`, {
         method: "POST",
@@ -429,6 +442,7 @@ const handleDownload = async () => {
       alert("Error starting stream");
     }
   };
+  
 
   const handleToggleStream = async (id) => {
     try {
@@ -551,7 +565,7 @@ const handleDownload = async () => {
           {inputSource === "obs" && (
             <div className="p-2 bg-blue-100 rounded-md">
               <p className="text-sm">
-                Configure OBS untuk streaming ke: <strong>{`${PROTOCOL}://${window.location.hostname.replace("3000", "8000")}`}</strong> (biasanya <code>rtmp://{window.location.hostname}:1935/live/obs</code>).
+              Configure OBS to stream to: <code>rtmp://{window.location.hostname}/live/</code>.
               </p>
             </div>
           )}
