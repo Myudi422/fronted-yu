@@ -34,7 +34,7 @@ const API_BASE = `${PROTOCOL}://${window.location.hostname.replace("3000", "8000
 const WS_URL = `${WS_PROTOCOL}://${window.location.hostname.replace("3000", "8000")}${PORT}/ws`;
 
 // =========================================
-// Komponen ServerStatsWidget (tetap sama)
+// Komponen ServerStatsWidget (tetap sama fungsinya)
 // =========================================
 function ServerStatsWidget() {
   const [stats, setStats] = useState({
@@ -74,17 +74,13 @@ function ServerStatsWidget() {
     {
       icon: <MemoryStick className="w-6 h-6 text-green-500" />,
       label: "Memory Usage",
-      value: `${stats.memory.percent}% (${(stats.memory.used / (1024 * 1024)).toFixed(
-        2
-      )} MB / ${(stats.memory.total / (1024 * 1024)).toFixed(2)} MB)`,
+      value: `${stats.memory.percent}% (${(stats.memory.used / (1024 * 1024)).toFixed(2)} MB / ${(stats.memory.total / (1024 * 1024)).toFixed(2)} MB)`,
       progress: stats.memory.percent,
     },
     {
       icon: <HardDrive className="w-6 h-6 text-red-500" />,
       label: "Disk Usage",
-      value: `${stats.disk.percent}% (${(stats.disk.used / (1024 * 1024 * 1024)).toFixed(
-        2
-      )} GB / ${(stats.disk.total / (1024 * 1024 * 1024)).toFixed(2)} GB)`,
+      value: `${stats.disk.percent}% (${(stats.disk.used / (1024 * 1024 * 1024)).toFixed(2)} GB / ${(stats.disk.total / (1024 * 1024 * 1024)).toFixed(2)} GB)`,
       progress: stats.disk.percent,
     },
     {
@@ -110,14 +106,14 @@ function ServerStatsWidget() {
   ];
 
   return (
-    <Card className="p-4">
+    <Card className="p-4 bg-transparent shadow-lg rounded-lg border border-white/30 backdrop-blur-md">
       <CardHeader>
         <CardTitle>Server Stats</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {statsData.slice(0, 3).map((stat, index) => (
-            <div key={index} className="flex items-center gap-2 p-2 bg-gray-100 rounded-md">
+            <div key={index} className="flex items-center gap-4 p-4 bg-transparent rounded-md border border-white/30 backdrop-blur-sm">
               {stat.icon}
               <div className="w-full">
                 <p className="text-sm font-medium">
@@ -130,7 +126,7 @@ function ServerStatsWidget() {
         </div>
         <div className="grid gap-4 mt-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
           {statsData.slice(3).map((stat, index) => (
-            <div key={index + 3} className="flex items-center gap-2 p-2 bg-gray-100 rounded-md">
+            <div key={index + 3} className="flex items-center gap-4 p-4 bg-transparent rounded-md border border-white/30 backdrop-blur-sm">
               {stat.icon}
               <div className="w-full">
                 <p className="text-sm font-medium">
@@ -162,14 +158,22 @@ function Login({ onLoginSuccess }) {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75 z-50">
-      <div className="bg-white p-6 rounded shadow-md w-80">
-        <h2 className="text-2xl font-bold mb-4 text-center">Login</h2>
+    <div
+      className="fixed inset-0 flex items-center justify-center z-50"
+      style={{
+        backgroundImage: "url('https://i.pinimg.com/736x/ca/d9/cd/cad9cd16d72f5696d2d2d9dc9f937b99.jpg')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
+      <div className="p-6 rounded-lg shadow-md w-80 border border-white/30 backdrop-blur-md bg-white/60">
+        <h2 className="text-2xl font-bold mb-4 text-center text-gray-900">Login</h2>
         <Input
           type="password"
           placeholder="Enter password"
           value={loginPassword}
           onChange={(e) => setLoginPassword(e.target.value)}
+          className="w-full bg-transparent rounded-md border border-white/30 text-gray-900 placeholder-gray-500"
         />
         {loginError && <p className="text-red-500 mt-2 text-center">{loginError}</p>}
         <Button onClick={handleLogin} className="mt-4 w-full">
@@ -179,6 +183,7 @@ function Login({ onLoginSuccess }) {
     </div>
   );
 }
+
 
 // =========================================
 // Komponen Utama Livestream Manager
@@ -201,7 +206,7 @@ function YoutubeLivestreamManagerMain() {
   const [scheduledStreams, setScheduledStreams] = useState([]);
   const [isDownloading, setIsDownloading] = useState(false);
 
-  // Fungsi pembantu dan useEffect untuk localStorage, WebSocket, dan pengambilan data
+  // Inisialisasi nilai dari localStorage
   useEffect(() => {
     const storedDriveUrl = localStorage.getItem("driveUrl");
     if (storedDriveUrl) setDriveUrl(storedDriveUrl);
@@ -474,230 +479,237 @@ function YoutubeLivestreamManagerMain() {
   };
 
   return (
-    <div className="container mx-auto p-4 space-y-6">
-      {isDownloading && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
-          <div className="bg-white p-4 rounded-md shadow-md">
-            <p className="text-lg font-semibold">Downloading... Please wait</p>
+    // Wrapper dengan background image full-screen
+    <div className="min-h-screen relative">
+      {/* Background image */}
+      <div
+        className="absolute inset-0 bg-cover bg-center opacity-40"
+        style={{
+          backgroundImage: "url('https://i.pinimg.com/736x/fe/46/f9/fe46f9922dd9575ebb6ef98c0177bd6e.jpg')",
+        }}
+      ></div>
+      {/* Konten utama, tanpa background warna agar menyatu dengan image */}
+      <div className="relative z-10 container mx-auto max-w-full p-6 space-y-6">
+        {isDownloading && (
+          <div className="fixed inset-0 bg-white/60 backdrop-blur-md flex items-center justify-center z-50">
+            <div className="p-6 rounded-lg shadow-md w-80 border border-white/30 backdrop-blur-md bg-transparent">
+              <p className="text-lg font-semibold text-gray-900">Downloading... Please wait</p>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      <ServerStatsWidget />
+        <ServerStatsWidget />
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Livestream Manager - YukStream 💕</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex flex-col gap-2">
-            <Select value={inputSource} onValueChange={setInputSource} className="w-full">
-              <SelectTrigger>
-                <SelectValue placeholder="Select Input Source" />
+        <Card className="bg-transparent shadow-lg rounded-lg border border-white/30 backdrop-blur-md">
+          <CardHeader>
+            <CardTitle>Livestream Manager - YukStream 💕</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex flex-col gap-2">
+              <Select value={inputSource} onValueChange={setInputSource} className="w-full">
+                <SelectTrigger className="bg-transparent rounded-md border border-gray-300">
+                  <SelectValue placeholder="Select Input Source" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="file">File</SelectItem>
+                  <SelectItem value="obs">OBS</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {inputSource === "file" && (
+              <>
+                <div className="flex flex-col gap-2">
+                  <Input
+                    placeholder="Enter Google Drive URL"
+                    value={driveUrl}
+                    onChange={(e) => setDriveUrl(e.target.value)}
+                    className="w-full bg-transparent rounded-md border border-gray-300 text-gray-900"
+                  />
+                  <Input
+                    placeholder="Custom File Name (Optional)"
+                    value={customName}
+                    onChange={(e) => setCustomName(e.target.value)}
+                    className="w-full bg-transparent rounded-md border border-gray-300 text-gray-900"
+                  />
+                  <Button onClick={handleDownload} disabled={!driveUrl} className="flex items-center">
+                    <Download className="h-4 w-4" />
+                    <span className="ml-2">Download</span>
+                  </Button>
+                </div>
+                <div className="flex items-center gap-2 p-4 bg-transparent rounded-md border border-gray-200">
+                  <Select value={selectedFile} onValueChange={setSelectedFile} className="flex-1">
+                    <SelectTrigger className="bg-transparent rounded-md border border-gray-300">
+                      <SelectValue placeholder="Select a file" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {files.map((file) => (
+                        <SelectItem key={file} value={file}>
+                          {file}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Button onClick={handleDeleteFile} disabled={!selectedFile} className="flex items-center">
+                    <Trash2 className="h-4 w-4" />
+                    <span className="ml-2">Delete</span>
+                  </Button>
+                </div>
+              </>
+            )}
+
+            {inputSource === "obs" && (
+              <div className="p-4 bg-transparent rounded-md border border-gray-200">
+                <p className="text-sm text-gray-900">
+                  Configure OBS to stream to: <code>rtmp://{window.location.hostname}/live/</code>.
+                </p>
+              </div>
+            )}
+
+            <Input
+              placeholder="Enter Stream Key"
+              value={youtubeKey}
+              onChange={(e) => setYoutubeKey(e.target.value)}
+              className="w-full bg-transparent rounded-md border border-gray-300 text-gray-900"
+            />
+
+            <Select value={platform} onValueChange={setPlatform} className="w-full">
+              <SelectTrigger className="bg-transparent rounded-md border border-gray-300">
+                <SelectValue placeholder="Select Platform" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="file">File</SelectItem>
-                <SelectItem value="obs">OBS</SelectItem>
+                <SelectItem value="youtube">YouTube</SelectItem>
+                <SelectItem value="facebook">Facebook</SelectItem>
+                <SelectItem value="other">Other</SelectItem>
               </SelectContent>
             </Select>
-          </div>
 
-          {inputSource === "file" && (
-            <>
-              <div className="flex flex-col gap-2">
+            {platform === "other" && (
+              <Input
+                placeholder="Enter Custom RTMP URL"
+                value={customRtmpUrl}
+                onChange={(e) => setCustomRtmpUrl(e.target.value)}
+                className="w-full bg-transparent rounded-md border border-gray-300 text-gray-900"
+              />
+            )}
+
+            <Select value={scheduleType} onValueChange={setScheduleType} className="w-full">
+              <SelectTrigger className="bg-transparent rounded-md border border-gray-300">
+                <SelectValue placeholder="Select Schedule Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="now">Now</SelectItem>
+                <SelectItem value="schedule">Schedule - Local Time</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {scheduleType === "schedule" && (
+              <>
                 <Input
-                  placeholder="Enter Google Drive URL"
-                  value={driveUrl}
-                  onChange={(e) => setDriveUrl(e.target.value)}
-                  className="w-full"
+                  type="datetime-local"
+                  value={scheduleDate}
+                  onChange={(e) => setScheduleDate(e.target.value)}
+                  className="w-full bg-transparent rounded-md border border-gray-300"
+                  placeholder="Start Date and Time"
                 />
                 <Input
-                  placeholder="Custom File Name (Optional)"
-                  value={customName}
-                  onChange={(e) => setCustomName(e.target.value)}
-                  className="w-full"
+                  type="datetime-local"
+                  value={scheduleEndDate}
+                  onChange={(e) => setScheduleEndDate(e.target.value)}
+                  className="w-full bg-transparent rounded-md border border-gray-300"
+                  placeholder="End Date and Time"
                 />
-                <Button onClick={handleDownload} disabled={!driveUrl} className="flex-none">
-                  <Download className="h-4 w-4" />
-                  <span className="ml-2">Download</span>
-                </Button>
-              </div>
-              <div className="flex items-center gap-2">
-                <Select
-                  value={selectedFile}
-                  onValueChange={setSelectedFile}
-                  className="flex-1"
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a file" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {files.map((file) => (
-                      <SelectItem key={file} value={file}>
-                        {file}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Button onClick={handleDeleteFile} disabled={!selectedFile} className="flex-none">
-                  <Trash2 className="h-4 w-4" />
-                  <span className="ml-2">Delete</span>
-                </Button>
-              </div>
-            </>
-          )}
+              </>
+            )}
 
-          {inputSource === "obs" && (
-            <div className="p-2 bg-blue-100 rounded-md">
-              <p className="text-sm">
-                Configure OBS to stream to: <code>rtmp://{window.location.hostname}/live/</code>.
-              </p>
-            </div>
-          )}
-
-          <Input
-            placeholder="Enter Stream Key"
-            value={youtubeKey}
-            onChange={(e) => setYoutubeKey(e.target.value)}
-            className="w-full"
-          />
-
-          <Select value={platform} onValueChange={setPlatform} className="w-full">
-            <SelectTrigger>
-              <SelectValue placeholder="Select Platform" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="youtube">YouTube</SelectItem>
-              <SelectItem value="facebook">Facebook</SelectItem>
-              <SelectItem value="other">Other</SelectItem>
-            </SelectContent>
-          </Select>
-
-          {platform === "other" && (
-            <Input
-              placeholder="Enter Custom RTMP URL"
-              value={customRtmpUrl}
-              onChange={(e) => setCustomRtmpUrl(e.target.value)}
-              className="w-full"
-            />
-          )}
-
-          <Select value={scheduleType} onValueChange={setScheduleType} className="w-full">
-            <SelectTrigger>
-              <SelectValue placeholder="Select Schedule Type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="now">Now</SelectItem>
-              <SelectItem value="schedule">Schedule - Local Time</SelectItem>
-            </SelectContent>
-          </Select>
-
-          {scheduleType === "schedule" && (
-            <>
-              <Input
-                type="datetime-local"
-                value={scheduleDate}
-                onChange={(e) => setScheduleDate(e.target.value)}
-                className="w-full"
-                placeholder="Start Date and Time"
-              />
-              <Input
-                type="datetime-local"
-                value={scheduleEndDate}
-                onChange={(e) => setScheduleEndDate(e.target.value)}
-                className="w-full"
-                placeholder="End Date and Time"
-              />
-            </>
-          )}
-
-          <Button
-            onClick={handleStartStream}
-            disabled={inputSource === "file" ? (!selectedFile || !youtubeKey) : !youtubeKey}
-          >
-            <PlayCircle className="h-4 w-4" />
-            <span className="ml-2">
-              {scheduleType === "schedule" ? "Schedule Stream" : "Start Now"}
-            </span>
-          </Button>
-
-          <h3 className="font-semibold">Active Streams</h3>
-          {streams.map((stream) => (
-            <div
-              key={stream.id}
-              className="p-4 bg-gray-100 rounded-md flex items-center justify-between"
+            <Button
+              onClick={handleStartStream}
+              disabled={inputSource === "file" ? (!selectedFile || !youtubeKey) : !youtubeKey}
+              className="flex items-center"
             >
-              <div className="flex flex-col">
-                <p className="truncate">
-                  {stream.file} (<span>{maskStreamKey(stream.youtube_key)}</span>)
-                </p>
-                {stream.schedule_end_time && (
-  <p className="text-xs text-gray-500">
-    Ends at:{" "}
-    {new Date(stream.schedule_end_time).toLocaleString(navigator.language, {
-      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-    })}
-  </p>
-)}
+              <PlayCircle className="h-4 w-4" />
+              <span className="ml-2">
+                {scheduleType === "schedule" ? "Schedule Stream" : "Start Now"}
+              </span>
+            </Button>
 
-              </div>
-              <div className="flex gap-2">
-                <Button onClick={() => handleToggleStream(stream.id)}>
-                  {stream.active ? (
-                    <>
-                      <PauseCircle className="h-4 w-4" />
-                      <span className="ml-2">Pause</span>
-                    </>
-                  ) : (
-                    <>
-                      <PlayCircle className="h-4 w-4" />
-                      <span className="ml-2">Play</span>
-                    </>
+            <h3 className="font-semibold text-gray-900">Active Streams</h3>
+            {streams.map((stream) => (
+              <div
+                key={stream.id}
+                className="p-4 bg-transparent rounded-md border border-gray-200 flex items-center justify-between"
+              >
+                <div className="flex flex-col">
+                  <p className="truncate text-gray-900">
+                    {stream.file} (<span>{maskStreamKey(stream.youtube_key)}</span>)
+                  </p>
+                  {stream.schedule_end_time && (
+                    <p className="text-xs text-gray-500">
+                      Ends at:{" "}
+                      {new Date(stream.schedule_end_time).toLocaleString(navigator.language, {
+                        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                      })}
+                    </p>
                   )}
-                </Button>
-                <Button onClick={() => handleDeleteStream(stream.id)}>
-                  <Trash2 className="h-4 w-4" />
-                  <span className="ml-2">Delete</span>
-                </Button>
+                </div>
+                <div className="flex gap-2">
+                  <Button onClick={() => handleToggleStream(stream.id)} className="flex items-center">
+                    {stream.active ? (
+                      <>
+                        <PauseCircle className="h-4 w-4" />
+                        <span className="ml-2">Pause</span>
+                      </>
+                    ) : (
+                      <>
+                        <PlayCircle className="h-4 w-4" />
+                        <span className="ml-2">Play</span>
+                      </>
+                    )}
+                  </Button>
+                  <Button onClick={() => handleDeleteStream(stream.id)} className="flex items-center">
+                    <Trash2 className="h-4 w-4" />
+                    <span className="ml-2">Delete</span>
+                  </Button>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
 
-          <h3 className="font-semibold">Scheduled Streams</h3>
-          {scheduledStreams.map((stream) => (
-            <div
-              key={stream.id}
-              className="p-4 bg-yellow-100 rounded-md flex items-center justify-between"
-            >
-              <p className="truncate flex-1">
-                {stream.file} -{" "}
-                {new Date(stream.schedule_time).toLocaleString(navigator.language, {
-                  timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                })}
-                {" "} to {" "}
-                {new Date(stream.schedule_end_time).toLocaleString(navigator.language, {
-                  timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                })}
-              </p>
-              <div className="flex gap-2">
-                <Button onClick={() => handleStartScheduledStream(stream.id)}>
-                  <PlayCircle className="h-4 w-4" />
-                  <span className="ml-2">Start Now</span>
-                </Button>
-                <Button onClick={() => handleDeleteScheduledStream(stream.id)}>
-                  <Trash2 className="h-4 w-4" />
-                  <span className="ml-2">Delete</span>
-                </Button>
+            <h3 className="font-semibold text-gray-900">Scheduled Streams</h3>
+            {scheduledStreams.map((stream) => (
+              <div
+                key={stream.id}
+                className="p-4 bg-transparent rounded-md border border-gray-200 flex items-center justify-between"
+              >
+                <p className="truncate flex-1 text-gray-900">
+                  {stream.file} -{" "}
+                  {new Date(stream.schedule_time).toLocaleString(navigator.language, {
+                    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                  })}
+                  {" "} to {" "}
+                  {new Date(stream.schedule_end_time).toLocaleString(navigator.language, {
+                    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                  })}
+                </p>
+                <div className="flex gap-2">
+                  <Button onClick={() => handleStartScheduledStream(stream.id)} className="flex items-center">
+                    <PlayCircle className="h-4 w-4" />
+                    <span className="ml-2">Start Now</span>
+                  </Button>
+                  <Button onClick={() => handleDeleteScheduledStream(stream.id)} className="flex items-center">
+                    <Trash2 className="h-4 w-4" />
+                    <span className="ml-2">Delete</span>
+                  </Button>
+                </div>
               </div>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
-      <footer className="w-full py-4 bg-gray-900 text-white text-center text-sm mt-8">
-        <p>
-          Made with ❤️ by <span className="font-semibold">YukStream</span> &copy; 2025
-        </p>
-      </footer>
+            ))}
+          </CardContent>
+        </Card>
+        <footer className="w-full py-4 bg-transparent text-gray-600 text-center text-sm mt-8 border-t border-white/30 backdrop-blur-md">
+          <p>
+            Made with ❤️ by <span className="font-semibold">YukStream</span> &copy; 2025
+          </p>
+        </footer>
+      </div>
     </div>
   );
 }
