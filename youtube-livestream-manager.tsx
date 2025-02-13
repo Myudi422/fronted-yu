@@ -634,45 +634,63 @@ function YoutubeLivestreamManagerMain() {
             </Button>
 
             <h3 className="font-semibold text-gray-900">Active Streams</h3>
-            {streams.map((stream) => (
-              <div
-                key={stream.id}
-                className="p-4 bg-transparent rounded-md border border-gray-200 flex items-center justify-between"
-              >
-                <div className="flex flex-col">
-                  <p className="truncate text-gray-900">
-                    {stream.file} (<span>{maskStreamKey(stream.youtube_key)}</span>)
-                  </p>
-                  {stream.schedule_end_time && (
-                    <p className="text-xs text-gray-500">
-                      Ends at:{" "}
-                      {new Date(stream.schedule_end_time).toLocaleString(navigator.language, {
-                        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                      })}
-                    </p>
-                  )}
-                </div>
-                <div className="flex gap-2">
-                  <Button onClick={() => handleToggleStream(stream.id)} className="flex items-center">
-                    {stream.active ? (
-                      <>
-                        <PauseCircle className="h-4 w-4" />
-                        <span className="ml-2">Pause</span>
-                      </>
-                    ) : (
-                      <>
-                        <PlayCircle className="h-4 w-4" />
-                        <span className="ml-2">Play</span>
-                      </>
-                    )}
-                  </Button>
-                  <Button onClick={() => handleDeleteStream(stream.id)} className="flex items-center">
-                    <Trash2 className="h-4 w-4" />
-                    <span className="ml-2">Delete</span>
-                  </Button>
-                </div>
-              </div>
-            ))}
+{streams.map((stream) => {
+  // Menentukan platform berdasarkan nilai stream.platform
+  const displayPlatform =
+    stream.platform && stream.platform.toLowerCase() === "facebook"
+      ? "Facebook"
+      : stream.platform && stream.platform.toLowerCase() === "other"
+      ? "Other"
+      : "Youtube";
+  return (
+    <div
+      key={stream.id}
+      className="p-4 bg-transparent rounded-md border border-gray-200 flex items-center justify-between"
+    >
+      <div className="flex flex-col">
+        {/* Tampilan Desktop */}
+        <p className="hidden md:block text-gray-900">
+          {stream.file} (<span>{maskStreamKey(stream.youtube_key)}</span>)
+        </p>
+        {/* Tampilan Mobile: nama file akan ter‑truncate jika panjang */}
+        <p className="md:hidden text-gray-900 flex items-center">
+          <span className="truncate flex-1">{stream.file}</span>
+          <span className="flex-shrink-0 ml-1">
+            - {displayPlatform} - (<span>{maskStreamKey(stream.youtube_key)}</span>)
+          </span>
+        </p>
+        {stream.schedule_end_time && (
+          <p className="text-xs text-gray-500">
+            Ends at:{" "}
+            {new Date(stream.schedule_end_time).toLocaleString(navigator.language, {
+              timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            })}
+          </p>
+        )}
+      </div>
+      <div className="flex gap-2">
+        <Button onClick={() => handleToggleStream(stream.id)} className="flex items-center">
+          {stream.active ? (
+            <>
+              <PauseCircle className="h-4 w-4" />
+              <span className="ml-2">Pause</span>
+            </>
+          ) : (
+            <>
+              <PlayCircle className="h-4 w-4" />
+              <span className="ml-2">Play</span>
+            </>
+          )}
+        </Button>
+        <Button onClick={() => handleDeleteStream(stream.id)} className="flex items-center">
+          <Trash2 className="h-4 w-4" />
+          <span className="ml-2">Delete</span>
+        </Button>
+      </div>
+    </div>
+  );
+})}
+
 
             <h3 className="font-semibold text-gray-900">Scheduled Streams</h3>
             {scheduledStreams.map((stream) => (
