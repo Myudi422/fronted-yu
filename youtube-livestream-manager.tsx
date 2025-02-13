@@ -642,22 +642,23 @@ function YoutubeLivestreamManagerMain() {
       : stream.platform && stream.platform.toLowerCase() === "other"
       ? "Other"
       : "Youtube";
+
   return (
     <div
       key={stream.id}
       className="p-4 bg-transparent rounded-md border border-gray-200 flex items-center justify-between"
     >
       <div className="flex flex-col">
-        {/* Tampilan Desktop */}
-        <p className="hidden md:block text-gray-900">
-          {stream.file} (<span>{maskStreamKey(stream.youtube_key)}</span>)
-        </p>
-        {/* Tampilan Mobile: nama file akan ter‑truncate jika panjang */}
-        <p className="md:hidden text-gray-900 flex items-center">
-          <span className="truncate flex-1">{stream.file}</span>
-          <span className="flex-shrink-0 ml-1">
-            - {displayPlatform} - (<span>{maskStreamKey(stream.youtube_key)}</span>)
-          </span>
+        {/* Baris tunggal dengan setiap bagian ter‑truncate jika melebihi batas */}
+        <p className="text-gray-900 flex items-center whitespace-nowrap overflow-hidden">
+          {/* Bagian nama file: dialokasikan ruang lebih besar */}
+          <span className="truncate flex-[2]">{stream.file}</span>
+          <span className="mx-1 flex-shrink-0">-</span>
+          {/* Bagian platform */}
+          <span className="truncate flex-[1]">{displayPlatform}</span>
+          <span className="mx-1 flex-shrink-0">-</span>
+          {/* Bagian masked key */}
+          <span className="truncate flex-[1.5]">({maskStreamKey(stream.youtube_key)})</span>
         </p>
         {stream.schedule_end_time && (
           <p className="text-xs text-gray-500">
