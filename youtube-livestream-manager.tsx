@@ -635,7 +635,7 @@ function YoutubeLivestreamManagerMain() {
 
             <h3 className="font-semibold text-gray-900">Active Streams</h3>
 {streams.map((stream) => {
-  // Menentukan platform berdasarkan nilai stream.platform
+  // Tentukan platform yang ditampilkan
   const displayPlatform =
     stream.platform && stream.platform.toLowerCase() === "facebook"
       ? "Facebook"
@@ -649,16 +649,28 @@ function YoutubeLivestreamManagerMain() {
       className="p-4 bg-transparent rounded-md border border-gray-200 flex items-center justify-between"
     >
       <div className="flex flex-col">
-        {/* Baris tunggal dengan setiap bagian ter‑truncate jika melebihi batas */}
-        <p className="text-gray-900 flex items-center whitespace-nowrap overflow-hidden">
-          {/* Bagian nama file: dialokasikan ruang lebih besar */}
-          <span className="truncate flex-[2]">{stream.file}</span>
+        {/* Layout untuk layar sm ke atas: satu baris dengan masing‑masing bagian dibatasi */}
+        <p className="hidden sm:flex items-center whitespace-nowrap overflow-hidden text-gray-900">
+          {/* Bagian file name dialokasikan ruang lebih besar */}
+          <span className="truncate flex-1">{stream.file}</span>
           <span className="mx-1 flex-shrink-0">-</span>
-          {/* Bagian platform */}
-          <span className="truncate flex-[1]">{displayPlatform}</span>
+          {/* Bagian platform dengan batas lebar misalnya max-w-[80px] */}
+          <span className="truncate flex-initial max-w-[80px]">{displayPlatform}</span>
           <span className="mx-1 flex-shrink-0">-</span>
-          {/* Bagian masked key */}
-          <span className="truncate flex-[1.5]">({maskStreamKey(stream.youtube_key)})</span>
+          {/* Bagian masked key dengan batas lebar misalnya max-w-[120px] */}
+          <span className="truncate flex-initial max-w-[120px]">
+            ({maskStreamKey(stream.youtube_key)})
+          </span>
+        </p>
+        {/* Layout untuk layar ekstra kecil: dua baris */}
+        <p className="sm:hidden text-gray-900">
+          <span className="block truncate">{stream.file}</span>
+          <span className="block truncate">
+            -{" "}
+            {displayPlatform.length > 4
+              ? displayPlatform.substring(0, 4) + "..."
+              : displayPlatform}
+          </span>
         </p>
         {stream.schedule_end_time && (
           <p className="text-xs text-gray-500">
